@@ -36,6 +36,8 @@ import {
   mdiHelpCircleOutline,
 } from "@mdi/js";
 import StatisticsCardVertical from "@/components/statistics-card/StatisticsCardVertical.vue";
+import $solana from '@/atellix/solana-client'
+import Emitter from 'tiny-emitter'
 
 // demos
 import DashboardCongratulationJohn from "@/components/dashboard/DashboardCongratulationJohn.vue";
@@ -95,6 +97,53 @@ export default {
       statistics: "15",
       change: "-18%",
     };
+
+    onMounted(async () => {
+        $solana.init();
+        var wallets = $solana.getWallets();
+        //console.log('Wallets', wallets);
+        var walletAdapter;
+        var walletAwait = new Promise((resolve) => {
+            eventbus.on('WalletConnected', function (val) {
+                resolve(val);
+            });
+        });
+        if (wallets.length > 0) {
+            walletAdapter = wallets[0];
+            walletAdapter.on('connect', function (publicKey) {
+                console.log('Connected to ' + publicKey.toBase58());
+                var walletStatus = {
+                    'connnected': true,
+                    'icon': walletAdapter.icon,
+                    'pubkey': publicKey.toBase58(),
+                };
+                walletIcon.value = walletAdapter.icon;
+                walletConnected.value = true;
+                walletPubkey.value = publicKey.toBase58();
+                eventbus.emit('WalletConnected', true);
+            });
+            walletAdapter.on('disconnect', function () {
+                console.log('Disconnected');
+                var walletStatus = {
+                    'connnected': false,
+                };
+                walletConnected.value = false;
+                eventbus.emit('WalletConnected', false);
+            });
+            (async function (x) {
+                await walletAdapter.connect();
+                await walletAdapter.connect(); // Need to call twice on iOS?
+            })();
+        }
+        (async function (x) {
+            var ready = await walletAwait;
+            if (ready) {
+                console.log('Solana ready!');
+                $solana.getProvider(walletAdapter);
+                $solana.loadProgram('aqua-dex');
+            }
+        })();
+    });
 
     return {
       totalProfit,

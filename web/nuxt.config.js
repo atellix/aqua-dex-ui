@@ -1,6 +1,14 @@
+import fs from 'fs';
+import path from 'path';
 import colors from "vuetify/es5/util/colors";
 
 export default {
+  server: {
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, 'privkey.pem')),
+      cert: fs.readFileSync(path.resolve(__dirname, 'fullchain.pem'))
+    }
+  },
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
 
@@ -35,6 +43,7 @@ export default {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
     // https://go.nuxtjs.dev/vuetify
+    '@nuxt/typescript-build',
     "@nuxtjs/vuetify",
   ],
 

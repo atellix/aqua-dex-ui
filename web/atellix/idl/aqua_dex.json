@@ -1,0 +1,2177 @@
+{
+  "version": "1.0.0",
+  "name": "aqua_dex",
+  "instructions": [
+    {
+      "name": "version",
+      "accounts": [
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createMarket",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "agent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mktMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mktVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "prcVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "orders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "splTokenProg",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ascTokenProg",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemRent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inpAgentNonce",
+          "type": "u8"
+        },
+        {
+          "name": "inpMktVaultNonce",
+          "type": "u8"
+        },
+        {
+          "name": "inpPrcVaultNonce",
+          "type": "u8"
+        },
+        {
+          "name": "inpMktDecimals",
+          "type": "u8"
+        },
+        {
+          "name": "inpPrcDecimals",
+          "type": "u8"
+        },
+        {
+          "name": "inpMktMintType",
+          "type": "u8"
+        },
+        {
+          "name": "inpPrcMintType",
+          "type": "u8"
+        },
+        {
+          "name": "inpManagerWithdraw",
+          "type": "bool"
+        },
+        {
+          "name": "inpManagerCancel",
+          "type": "bool"
+        },
+        {
+          "name": "inpExpireEnable",
+          "type": "bool"
+        },
+        {
+          "name": "inpExpireMin",
+          "type": "i64"
+        },
+        {
+          "name": "inpTakerFee",
+          "type": "u32"
+        },
+        {
+          "name": "inpLogFee",
+          "type": "u64"
+        },
+        {
+          "name": "inpLogRebate",
+          "type": "u64"
+        },
+        {
+          "name": "inpLogReimburse",
+          "type": "u64"
+        },
+        {
+          "name": "inpMktVaultUuid",
+          "type": "u128"
+        },
+        {
+          "name": "inpPrcVaultUuid",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "limitBid",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "agent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userMktToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPrcToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mktVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prcVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "orders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "splTokenProg",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inpQuantity",
+          "type": "u64"
+        },
+        {
+          "name": "inpPrice",
+          "type": "u64"
+        },
+        {
+          "name": "inpPost",
+          "type": "bool"
+        },
+        {
+          "name": "inpFill",
+          "type": "bool"
+        },
+        {
+          "name": "inpExpires",
+          "type": "i64"
+        },
+        {
+          "name": "inpRollover",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "limitAsk",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "agent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userMktToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPrcToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mktVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prcVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "orders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "splTokenProg",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inpQuantity",
+          "type": "u64"
+        },
+        {
+          "name": "inpPrice",
+          "type": "u64"
+        },
+        {
+          "name": "inpPost",
+          "type": "bool"
+        },
+        {
+          "name": "inpFill",
+          "type": "bool"
+        },
+        {
+          "name": "inpExpires",
+          "type": "i64"
+        },
+        {
+          "name": "inpRollover",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "marketBid",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "agent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userMktToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPrcToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mktVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prcVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "orders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "splTokenProg",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inpByQuantity",
+          "type": "bool"
+        },
+        {
+          "name": "inpQuantity",
+          "type": "u64"
+        },
+        {
+          "name": "inpNetPrice",
+          "type": "u64"
+        },
+        {
+          "name": "inpFill",
+          "type": "bool"
+        },
+        {
+          "name": "inpRollover",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "marketAsk",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "agent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userMktToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPrcToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mktVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prcVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "orders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "splTokenProg",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inpByQuantity",
+          "type": "bool"
+        },
+        {
+          "name": "inpQuantity",
+          "type": "u64"
+        },
+        {
+          "name": "inpNetPrice",
+          "type": "u64"
+        },
+        {
+          "name": "inpFill",
+          "type": "bool"
+        },
+        {
+          "name": "inpRollover",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "cancelOrder",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "agent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userMktToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPrcToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mktVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prcVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "orders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "splTokenProg",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inpSide",
+          "type": "u8"
+        },
+        {
+          "name": "inpOrderId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "withdraw",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "agent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userMktToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPrcToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mktVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prcVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settle",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "splTokenProg",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "expireOrder",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "orders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleB",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inpSide",
+          "type": "u8"
+        },
+        {
+          "name": "inpOrderId",
+          "type": "u128"
+        },
+        {
+          "name": "inpRollover",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "managerCancelOrder",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "orders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "settleA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settleB",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inpSide",
+          "type": "u8"
+        },
+        {
+          "name": "inpOrderId",
+          "type": "u128"
+        },
+        {
+          "name": "inpRollover",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "extendLog",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "settle",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "managerWithdraw",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "agent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userMktToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPrcToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mktVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prcVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settle",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "splTokenProg",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "logStatus",
+      "accounts": [
+        {
+          "name": "settle",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [],
+      "returns": {
+        "defined": "LogStatusResult"
+      }
+    },
+    {
+      "name": "managerTransferSol",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "inpWithdraw",
+          "type": "bool"
+        },
+        {
+          "name": "inpAll",
+          "type": "bool"
+        },
+        {
+          "name": "inpAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "managerUpdateMarket",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "inpActive",
+          "type": "bool"
+        },
+        {
+          "name": "inpExpireEnable",
+          "type": "bool"
+        },
+        {
+          "name": "inpExpireMin",
+          "type": "i64"
+        },
+        {
+          "name": "inpTakerFee",
+          "type": "u32"
+        },
+        {
+          "name": "inpLogFee",
+          "type": "u64"
+        },
+        {
+          "name": "inpLogRebate",
+          "type": "u64"
+        },
+        {
+          "name": "inpLogReimburse",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "createVault",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "vaultDeposit",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "settle",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "vaultWithdraw",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "agent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userMktToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPrcToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mktVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prcVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "splTokenProg",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "managerVaultWithdraw",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "agent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userMktToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPrcToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mktVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prcVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "splTokenProg",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "closeVault",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeReceiver",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "closeTradeResult",
+      "accounts": [
+        {
+          "name": "feeReceiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "closeWithdrawResult",
+      "accounts": [
+        {
+          "name": "feeReceiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "result",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Market",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "active",
+            "type": "bool"
+          },
+          {
+            "name": "managerWithdraw",
+            "type": "bool"
+          },
+          {
+            "name": "managerCancel",
+            "type": "bool"
+          },
+          {
+            "name": "expireEnable",
+            "type": "bool"
+          },
+          {
+            "name": "expireMin",
+            "type": "i64"
+          },
+          {
+            "name": "logFee",
+            "type": "u64"
+          },
+          {
+            "name": "logRebate",
+            "type": "u64"
+          },
+          {
+            "name": "logReimburse",
+            "type": "u64"
+          },
+          {
+            "name": "takerFee",
+            "type": "u32"
+          },
+          {
+            "name": "state",
+            "type": "publicKey"
+          },
+          {
+            "name": "agent",
+            "type": "publicKey"
+          },
+          {
+            "name": "agentNonce",
+            "type": "u8"
+          },
+          {
+            "name": "manager",
+            "type": "publicKey"
+          },
+          {
+            "name": "mktMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "mktVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "mktNonce",
+            "type": "u8"
+          },
+          {
+            "name": "mktDecimals",
+            "type": "u8"
+          },
+          {
+            "name": "mktMintType",
+            "type": "u8"
+          },
+          {
+            "name": "prcMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "prcVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "prcNonce",
+            "type": "u8"
+          },
+          {
+            "name": "prcDecimals",
+            "type": "u8"
+          },
+          {
+            "name": "prcMintType",
+            "type": "u8"
+          },
+          {
+            "name": "orders",
+            "type": "publicKey"
+          },
+          {
+            "name": "settle0",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MarketState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "settleA",
+            "type": "publicKey"
+          },
+          {
+            "name": "settleB",
+            "type": "publicKey"
+          },
+          {
+            "name": "logRollover",
+            "type": "bool"
+          },
+          {
+            "name": "logDepositBalance",
+            "type": "u64"
+          },
+          {
+            "name": "actionCounter",
+            "type": "u64"
+          },
+          {
+            "name": "orderCounter",
+            "type": "u64"
+          },
+          {
+            "name": "activeBid",
+            "type": "u64"
+          },
+          {
+            "name": "activeAsk",
+            "type": "u64"
+          },
+          {
+            "name": "mktVaultBalance",
+            "type": "u64"
+          },
+          {
+            "name": "mktOrderBalance",
+            "type": "u64"
+          },
+          {
+            "name": "mktUserVaultBalance",
+            "type": "u64"
+          },
+          {
+            "name": "mktLogBalance",
+            "type": "u64"
+          },
+          {
+            "name": "prcVaultBalance",
+            "type": "u64"
+          },
+          {
+            "name": "prcOrderBalance",
+            "type": "u64"
+          },
+          {
+            "name": "prcUserVaultBalance",
+            "type": "u64"
+          },
+          {
+            "name": "prcLogBalance",
+            "type": "u64"
+          },
+          {
+            "name": "prcFeesBalance",
+            "type": "u64"
+          },
+          {
+            "name": "lastTs",
+            "type": "i64"
+          },
+          {
+            "name": "lastPrice",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserVault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "initialized",
+            "type": "bool"
+          },
+          {
+            "name": "market",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "mktTokens",
+            "type": "u64"
+          },
+          {
+            "name": "prcTokens",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TradeResult",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tokensReceived",
+            "type": "u64"
+          },
+          {
+            "name": "tokensSent",
+            "type": "u64"
+          },
+          {
+            "name": "tokensFee",
+            "type": "u64"
+          },
+          {
+            "name": "postedQuantity",
+            "type": "u64"
+          },
+          {
+            "name": "orderId",
+            "type": "u128"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawResult",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mktTokens",
+            "type": "u64"
+          },
+          {
+            "name": "prcTokens",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LogStatusResult",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "prev",
+            "type": "publicKey"
+          },
+          {
+            "name": "next",
+            "type": "publicKey"
+          },
+          {
+            "name": "items",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SemverRelease",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "major",
+            "type": "u32"
+          },
+          {
+            "name": "minor",
+            "type": "u32"
+          },
+          {
+            "name": "patch",
+            "type": "u32"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "Side",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Bid"
+          },
+          {
+            "name": "Ask"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SPLToken"
+          },
+          {
+            "name": "AtxSecurityToken"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DT",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "BidOrderMap"
+          },
+          {
+            "name": "BidOrder"
+          },
+          {
+            "name": "AskOrderMap"
+          },
+          {
+            "name": "AskOrder"
+          },
+          {
+            "name": "AccountMap"
+          },
+          {
+            "name": "Account"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderDT",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "BidOrderMap"
+          },
+          {
+            "name": "AskOrderMap"
+          },
+          {
+            "name": "BidOrder"
+          },
+          {
+            "name": "AskOrder"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SettleDT",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AccountMap"
+          },
+          {
+            "name": "Account"
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "MatchEvent",
+      "fields": [
+        {
+          "name": "eventType",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "actionId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "makerOrderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "makerFilled",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "maker",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "taker",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "takerSide",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "OrderEvent",
+      "fields": [
+        {
+          "name": "eventType",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "actionId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "marketToken",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "pricingToken",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "orderSide",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "filled",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "tokensSent",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "tokensReceived",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "tokensFee",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "posted",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "postedQuantity",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderQuantity",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "expires",
+          "type": "i64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CancelEvent",
+      "fields": [
+        {
+          "name": "eventType",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "actionId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "marketToken",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "pricingToken",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "manager",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "orderSide",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "orderPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderQuantity",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "tokenWithdrawn",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExpireEvent",
+      "fields": [
+        {
+          "name": "eventType",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "actionId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "orderSide",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "quantity",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "tokens",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "WithdrawEvent",
+      "fields": [
+        {
+          "name": "eventType",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "actionId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "marketAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "pricingAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "manager",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "marketTokens",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "pricingTokens",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "SettleEvent",
+      "fields": [
+        {
+          "name": "eventType",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "actionId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "settlementLog",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "marketTokens",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "pricingTokens",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "VaultDepositEvent",
+      "fields": [
+        {
+          "name": "eventType",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "actionId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "vault",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "marketTokens",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "marketBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "pricingTokens",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "pricingBalance",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "VaultWithdrawEvent",
+      "fields": [
+        {
+          "name": "eventType",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "actionId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "vault",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "marketAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "pricingAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "manager",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "marketTokens",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "pricingTokens",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "AccessDenied",
+      "msg": "Access denied"
+    },
+    {
+      "code": 6001,
+      "name": "MarketClosed",
+      "msg": "Market closed"
+    },
+    {
+      "code": 6002,
+      "name": "AccountNotFound",
+      "msg": "Account not found"
+    },
+    {
+      "code": 6003,
+      "name": "RecordNotFound",
+      "msg": "Record not found"
+    },
+    {
+      "code": 6004,
+      "name": "OrderNotFound",
+      "msg": "Order not found"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidParameters",
+      "msg": "Invalid parameters"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidAccount",
+      "msg": "Invalid account"
+    },
+    {
+      "code": 6007,
+      "name": "InvalidDerivedAccount",
+      "msg": "Invalid derived account"
+    },
+    {
+      "code": 6008,
+      "name": "VaultNotEmpty",
+      "msg": "Vault not empty"
+    },
+    {
+      "code": 6009,
+      "name": "OrderNotFilled",
+      "msg": "Order not filled"
+    },
+    {
+      "code": 6010,
+      "name": "InternalError",
+      "msg": "Internal error"
+    },
+    {
+      "code": 6011,
+      "name": "ExternalError",
+      "msg": "External error"
+    },
+    {
+      "code": 6012,
+      "name": "SettlementLogFull",
+      "msg": "Settlement log full"
+    },
+    {
+      "code": 6013,
+      "name": "SettlementLogNotEmpty",
+      "msg": "Settlement log not empty"
+    },
+    {
+      "code": 6014,
+      "name": "OrderbookFull",
+      "msg": "Orderbook full"
+    },
+    {
+      "code": 6015,
+      "name": "RetrySettlementAccount",
+      "msg": "Settlement log account does not match market, please update market data and retry"
+    },
+    {
+      "code": 6016,
+      "name": "Overflow",
+      "msg": "Overflow"
+    }
+  ],
+  "metadata": {
+    "address": "AQUAvuZCFUGtSc8uQBaTXfJz3YjMUbinMeXDoDQmZLvX"
+  }
+}
