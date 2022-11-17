@@ -103,5 +103,9 @@ export default {
       salesQueries,
     };
   },
+  async asyncData({ params, redirect }) {
+    console.log('Market Address');
+    console.log(params.address);
+  },
 };
 </script>
