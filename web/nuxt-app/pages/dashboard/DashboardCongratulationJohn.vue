@@ -37,7 +37,7 @@
           height="108"
           max-width="83"
           class="greeting-card-trophy"
-          src="@/assets/images/misc/trophy.png"
+          :src="require('@/assets/images/misc/trophy.png')"
         ></v-img>
       </v-col>
     </v-row>

@@ -95,5 +95,21 @@ export default {
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    transpile: [
+      '@solana/buffer-layout-utils',
+      '@solana/spl-token',
+      '@solana/wallet-adapter-base',
+      '@solana/wallet-adapter-solflare',
+      '@solana/wallet-adapter-phantom',
+      '@solana/wallet-adapter-glow',
+    ],
+    extend(config) {
+        config.module.rules.push({
+            test: /\.mjs$/,
+            include: /node_modules/,
+            type: "javascript/auto"
+        })
+    }
+  },
 };
