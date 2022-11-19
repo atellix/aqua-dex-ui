@@ -1,0 +1,83 @@
+<template>
+    <v-card>
+        <v-card-title>
+            <span class="me-3">Orderbook</span>
+        </v-card-title>
+        <v-card-text>
+            <v-row no-gutters>
+                <v-col cols="12" md="6" style="border-right: 1px solid grey;">
+                    <h3>Bids</h3>
+                    <v-simple-table dense v-if="data.bids">
+                        <template v-slot:default>
+                            <thead>
+                                <tr>
+                                    <th class="text-right">
+                                        Owner
+                                    </th>
+                                    <th class="text-right">
+                                        Quantity
+                                    </th>
+                                    <th class="text-right">
+                                        Price
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in data.bids" :key="item.key">
+                                    <td class="text-right">
+                                        {{ item.owner.substring(0, 4) }}...{{ item.owner.substring(item.owner.length - 4, item.owner.length) }}
+                                    </td>
+                                    <td class="text-right">
+                                        {{ (new Number(item.amount / market.mktTokenScale)).toFixed(2) }}
+                                    </td>
+                                    <td class="text-right">
+                                        {{ (new Number(item.price / market.prcTokenScale)).toFixed(4) }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </template>
+                    </v-simple-table>
+                </v-col>
+                <v-col cols="12" md="6" style="border-left: 1px solid grey; margin-left: -1px;">
+                    <h3 class="ml-3">Offers</h3>
+                    <v-simple-table dense v-if="data.asks">
+                        <template v-slot:default>
+                            <thead>
+                                <tr>
+                                    <th class="text-left">
+                                        Price
+                                    </th>
+                                    <th class="text-left">
+                                        Quantity
+                                    </th>
+                                    <th class="text-left">
+                                        Owner
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in data.asks" :key="item.key">
+                                    <td class="text-left">
+                                        {{ (new Number(item.price / market.prcTokenScale)).toFixed(4) }}
+                                    </td>
+                                    <td class="text-left">
+                                        {{ (new Number(item.amount / market.mktTokenScale)).toFixed(2) }}
+                                    </td>
+                                    <td class="text-left">
+                                        {{ item.owner.substring(0, 4) }}...{{ item.owner.substring(item.owner.length - 4, item.owner.length) }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </template>
+                    </v-simple-table>
+                </v-col>
+            </v-row>
+        </v-card-text>
+    </v-card>
+</template>
+
+<script>
+export default {
+    props: ['data', 'market'],
+}
+</script>

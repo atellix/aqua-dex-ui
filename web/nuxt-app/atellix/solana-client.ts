@@ -122,12 +122,12 @@ export default {
         }
         return Number(0)
     },
-    async getTokenBalance(mint, wallet) {
+    async getTokenBalance(mintPK, walletPK) {
         //console.log(mint, wallet)
-        let mintPK = new PublicKey(mint)
+        //let mintPK = new PublicKey(mint)
         //console.log('mintPK')
         //console.log(mintPK.toBase58())
-        let walletPK = new PublicKey(wallet)
+        //let walletPK = new PublicKey(wallet)
         //console.log('walletPK')
         //console.log(walletPK.toBase58())
         let tokenInfo = await this.associatedTokenAddress(walletPK, mintPK)
@@ -340,7 +340,14 @@ export default {
         var askVecData = this.decodeOrdersVec(askVec, res['pages'])
         var bidMapData = this.decodeOrdersMap(bidMap, res['pages'])
         var askMapData = this.decodeOrdersMap(askMap, res['pages'])
-        console.log(this.decodeOrderBookSide('bid', bidMapData, bidVecData))
-        console.log(this.decodeOrderBookSide('ask', askMapData, askVecData))
+        var bids = this.decodeOrderBookSide('bid', bidMapData, bidVecData)
+        var asks = this.decodeOrderBookSide('ask', askMapData, askVecData)
+        asks.sort(function(a, b) {
+            return a.key.localeCompare(b.key)
+        })
+        return {
+            'bids': bids,
+            'asks': asks,
+        }
     },
 }
