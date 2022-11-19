@@ -16,13 +16,13 @@
                             Bid on market tokens for purchase: MKT
                             <form>
                                 <v-radio-group v-model="matchType" row class="mt-0 mb-3" hide-details>
-                                    <v-radio value="limit" label="Limit Order"></v-radio>
-                                    <v-radio value="market" label="Market Order"></v-radio>
+                                    <v-radio value="limit" label="Limit Bid"></v-radio>
+                                    <v-radio value="market" label="Market Bid"></v-radio>
                                 </v-radio-group>
                                 <template v-if="matchType == 'limit'">
                                     <v-select v-model="fillType" :items="fillTypeSelect" label="Filling & Posting Mode"></v-select>
-                                    <v-text-field v-model="limitBidPrice" outlined dense persistent-hint label="Price"></v-text-field>
-                                    <v-text-field v-model="limitBidQty" outlined dense persistent-hint label="Quantity"></v-text-field>
+                                    <v-text-field v-model="limitBidPrice" outlined dense persistent-hint label="Bid Price"></v-text-field>
+                                    <v-text-field v-model="limitBidQty" outlined dense persistent-hint label="Bid Quantity"></v-text-field>
                                 </template>
                                 <template v-if="matchType == 'market'">
                                     <v-select v-model="marketOrderType" :items="marketOrderTypeSelect" label="Filling Mode"></v-select>
@@ -37,19 +37,35 @@
                             </form>
                         </v-card-text>
                         <v-card-text>
-                            <v-btn color="primary">
-                                Send Order
-                            </v-btn>
+                            <v-btn @click="sendOrder" color="primary">Place Bid</v-btn>
                         </v-card-text>
                     </template>
                     <template v-else-if="item == 'Offer'">
                         <v-card-text>
                             Offer market tokens for sale: MKT
+                            <form>
+                                <v-radio-group v-model="matchType" row class="mt-0 mb-3" hide-details>
+                                    <v-radio value="limit" label="Limit Offer"></v-radio>
+                                    <v-radio value="market" label="Market Offer"></v-radio>
+                                </v-radio-group>
+                                <template v-if="matchType == 'limit'">
+                                    <v-select v-model="fillType" :items="fillTypeSelect" label="Filling & Posting Mode"></v-select>
+                                    <v-text-field v-model="limitAskPrice" outlined dense persistent-hint label="Offer Price"></v-text-field>
+                                    <v-text-field v-model="limitAskQty" outlined dense persistent-hint label="Offer Quantity"></v-text-field>
+                                </template>
+                                <template v-if="matchType == 'market'">
+                                    <v-select v-model="marketOrderType" :items="marketOrderTypeSelect" label="Filling Mode"></v-select>
+                                    <template v-if="marketOrderType == 'quantity' || marketOrderType == 'fill_quantity'">
+                                        <v-text-field v-model="marketAskQty" outlined dense persistent-hint label="Quantity"></v-text-field>
+                                    </template>
+                                    <template v-else>
+                                        <v-text-field v-model="marketAskPrice" outlined dense persistent-hint label="Net Price"></v-text-field>
+                                    </template>
+                                </template>
+                            </form>
                         </v-card-text>
                         <v-card-text>
-                            <v-btn color="primary">
-                                Learn More
-                            </v-btn>
+                            <v-btn @click="sendOrder" color="primary">Place Offer</v-btn>
                         </v-card-text>
                     </template>
                 </v-tab-item>
@@ -64,10 +80,11 @@ import { mdiDotsVertical, mdiChevronUp, mdiChevronDown } from '@mdi/js'
 
 export default {
     props: ['data', 'market'],
-    setup(props) {
+    setup(props, context) {
+        const tab = ref(0)
         const matchType = ref('limit')
         const fillTypeSelect = ref([
-            { 'value': 'post', 'text': 'Fill Any & Post Order' }, // Fill: false, Post: true
+            { 'value': 'post', 'text': 'Fill Any & Post Bid' }, // Fill: false, Post: true
             { 'value': 'partial', 'text': 'Fill Any & Do Not Post' }, // Fill: false, Post: false
             { 'value': 'fill', 'text': 'Fill Entire Order or Cancel' }, // Fill: true, Post: false
         ])
@@ -83,6 +100,87 @@ export default {
         const marketBidQty = ref('')
         const limitBidPrice = ref('')
         const limitBidQty = ref('')
+        const marketAskPrice = ref('')
+        const marketAskQty = ref('')
+        const limitAskPrice = ref('')
+        const limitAskQty = ref('')
+        const sendOrder = () => {
+            var orderSpec = {}
+            if (tab.value === 0) {
+                orderSpec['orderType'] = 'bid'
+                if (matchType.value === 'limit') {
+                    orderSpec['matchType'] = 'limit'
+                    if (fillType.value == 'post') {
+                        orderSpec['postOrder'] = true
+                        orderSpec['fillOrder'] = false
+                    } else if (fillType.value == 'partial') {
+                        orderSpec['postOrder'] = false
+                        orderSpec['fillOrder'] = false
+                    } else if (fillType.value == 'fill') {
+                        orderSpec['postOrder'] = false
+                        orderSpec['fillOrder'] = true
+                    }
+                    orderSpec['price'] = Math.floor((new Number(limitBidPrice.value)) * props.market.prcTokenScale)
+                    orderSpec['quantity'] = Math.floor((new Number(limitBidQty.value)) * props.market.mktTokenScale)
+                } else if (matchType.value === 'market') {
+                    orderSpec['matchType'] = 'market'
+                    if (marketOrderType.value === 'quantity' || marketOrderType.value === 'fill_quantity') {
+                        orderSpec['byQuantity'] = true
+                        if (marketOrderType.value === 'fill_quantity') {
+                            orderSpec['fillOrder'] = true
+                        } else {
+                            orderSpec['fillOrder'] = false
+                        }
+                        orderSpec['quantity'] = Math.floor((new Number(marketBidQty.value)) * props.market.mktTokenScale)
+                    } else if (marketOrderType.value === 'net_price' || marketOrderType.value === 'fill_net_price') {
+                        orderSpec['byQuantity'] = false
+                        if (marketOrderType.value === 'fill_net_price') {
+                            orderSpec['fillOrder'] = true
+                        } else {
+                            orderSpec['fillOrder'] = false
+                        }
+                        orderSpec['netPrice'] = Math.floor((new Number(marketBidPrice.value)) * props.market.prcTokenScale)
+                    }
+                }
+            } else if (tab.value === 1) {
+                orderSpec['orderType'] = 'ask'
+                if (matchType.value === 'limit') {
+                    orderSpec['matchType'] = 'limit'
+                    if (fillType.value == 'post') {
+                        orderSpec['postOrder'] = true
+                        orderSpec['fillOrder'] = false
+                    } else if (fillType.value == 'partial') {
+                        orderSpec['postOrder'] = false
+                        orderSpec['fillOrder'] = false
+                    } else if (fillType.value == 'fill') {
+                        orderSpec['postOrder'] = false
+                        orderSpec['fillOrder'] = true
+                    }
+                    orderSpec['price'] = Math.floor((new Number(limitAskPrice.value)) * props.market.prcTokenScale)
+                    orderSpec['quantity'] = Math.floor((new Number(limitAskQty.value)) * props.market.mktTokenScale)
+                } else if (matchType.value === 'market') {
+                    orderSpec['matchType'] = 'market'
+                    if (marketOrderType.value === 'quantity' || marketOrderType.value === 'fill_quantity') {
+                        orderSpec['byQuantity'] = true
+                        if (marketOrderType.value === 'fill_quantity') {
+                            orderSpec['fillOrder'] = true
+                        } else {
+                            orderSpec['fillOrder'] = false
+                        }
+                        orderSpec['quantity'] = Math.floor((new Number(marketAskQty.value)) * props.market.mktTokenScale)
+                    } else if (marketOrderType.value === 'net_price' || marketOrderType.value === 'fill_net_price') {
+                        orderSpec['byQuantity'] = false
+                        if (marketOrderType.value === 'fill_net_price') {
+                            orderSpec['fillOrder'] = true
+                        } else {
+                            orderSpec['fillOrder'] = false
+                        }
+                        orderSpec['netPrice'] = Math.floor((new Number(marketAskPrice.value)) * props.market.prcTokenScale)
+                    }
+                }
+            }
+            context.emit('sendOrder', orderSpec)
+        }
         return {
             marketOrderTypeSelect,
             marketOrderType,
@@ -90,10 +188,15 @@ export default {
             marketBidQty,
             limitBidPrice,
             limitBidQty,
+            marketAskPrice,
+            marketAskQty,
+            limitAskPrice,
+            limitAskQty,
             fillTypeSelect,
             fillType,
             matchType,
-            tab: null,
+            sendOrder,
+            tab,
             items: ['Bid', 'Offer'],
         }
     },

@@ -30,7 +30,7 @@
             </v-row>
             <v-row no-gutter>
                 <v-col cols="12">
-                    <order-entry :data="tokenBalanceList" :market="marketSummary"></order-entry>
+                    <order-entry :data="tokenBalanceList" :market="marketSummary" @sendOrder="sendOrder"></order-entry>
                 </v-col>
             </v-row>
             <v-row no-gutter>
@@ -167,8 +167,8 @@ export default {
                                 'prcTokenBalance': await $solana.getTokenBalance(marketData.prcMint, new PublicKey(walletPubkey.value)),
                             };
                             $solana.provider.connection.onAccountChange(marketData.orders, (accountInfo, context) => {
-                                console.log('Orderbook changed');
-                                console.log(accountInfo);
+                                //console.log('Orderbook changed');
+                                //console.log(accountInfo);
                                 orderbookData.value = $solana.decodeOrderBook(accountInfo.data);
                                 console.log('Orderbook updated');
                             });
@@ -179,7 +179,14 @@ export default {
             })();
         });
 
+        const sendOrder = async (orderSpec) => {
+            console.log('Send Order:')
+            console.log('Order Spec:')
+            console.log(orderSpec)
+        }
+
         return {
+            sendOrder,
             marketSummary,
             orderbookData,
             tokenBalanceList,
