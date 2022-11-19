@@ -88,6 +88,7 @@ export default {
     setup(props, context) {
         const eventbus = new Emitter();
         const marketSummary = ref({});
+        const marketAccounts = ref({});
         const orderbookData = ref({});
         const tokenBalanceList = ref({
             'mktTokenBalance': '0',
@@ -146,7 +147,9 @@ export default {
                     if (marketAddr) {
                         var marketKeyData = bs58.decode(marketAddr);
                         if (marketKeyData.length === 32) {
-                            var marketData = await $solana.getAccountData('aqua-dex', 'market', new PublicKey(marketAddr));
+                            var marketPK = new PublicKey(marketAddr);
+                            var walletPK = new PublicKey(walletPubkey.value);
+                            var marketData = await $solana.getAccountData('aqua-dex', 'market', marketPK);
                             //console.log(marketData);
                             var marketStateData = await $solana.getAccountData('aqua-dex', 'marketState', marketData.state);
                             //console.log(marketStateData);
@@ -162,9 +165,28 @@ export default {
                                 'mktTokenScale': 10 ** new Number(marketData.mktDecimals),
                                 'prcTokenScale': 10 ** new Number(marketData.prcDecimals),
                             };
+                            const marketAgent = await $solana.programAddress([marketPK.toBuffer()], $solana.program['aqua-dex'].programId)
+                            const marketAgentPK = new PublicKey(marketAgent.pubkey)
+                            const tokenVault1 = await $solana.associatedTokenAddress(marketAgentPK, marketData.mktMint)
+                            const tokenVault2 = await $solana.associatedTokenAddress(marketAgentPK, marketData.prcMint)
+                            const userToken1 = await $solana.associatedTokenAddress(walletPK, marketData.mktMint)
+                            const userToken2 = await $solana.associatedTokenAddress(walletPK, marketData.prcMint)
+                            marketAccounts.value = {
+                                'market': marketPK,
+                                'state': marketData.state,
+                                'agent': marketAgentPK,
+                                'user': walletPK,
+                                'userMktToken': new PublicKey(userToken1.pubkey),
+                                'userPrcToken': new PublicKey(userToken2.pubkey),
+                                'mktVault': new PublicKey(tokenVault1.pubkey),
+                                'prcVault': new PublicKey(tokenVault2.pubkey), 
+                                'orders': marketData.orders,
+                                'settleA': marketStateData.settleA,
+                                'settleB': marketStateData.settleB,
+                            };
                             tokenBalanceList.value = {
-                                'mktTokenBalance': await $solana.getTokenBalance(marketData.mktMint, new PublicKey(walletPubkey.value)),
-                                'prcTokenBalance': await $solana.getTokenBalance(marketData.prcMint, new PublicKey(walletPubkey.value)),
+                                'mktTokenBalance': await $solana.getTokenBalance(marketData.mktMint, walletPK),
+                                'prcTokenBalance': await $solana.getTokenBalance(marketData.prcMint, walletPK),
                             };
                             $solana.provider.connection.onAccountChange(marketData.orders, (accountInfo, context) => {
                                 //console.log('Orderbook changed');
@@ -180,9 +202,9 @@ export default {
         });
 
         const sendOrder = async (orderSpec) => {
-            console.log('Send Order:')
-            console.log('Order Spec:')
-            console.log(orderSpec)
+            console.log('Send Order:');
+            console.log(orderSpec);
+            console.log(await $solana.sendOrder(marketAccounts.value, orderSpec));
         }
 
         return {

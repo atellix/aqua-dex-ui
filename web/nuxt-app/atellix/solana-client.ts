@@ -350,4 +350,76 @@ export default {
             'asks': asks,
         }
     },
+    async sendOrder(marketAccounts, orderSpec) {
+        var accounts = {
+            'splTokenProg': TOKEN_PROGRAM_ID,
+        }
+        var accountList = [
+            'market', 'state', 'agent', 'user', 'userMktToken', 'userPrcToken', 'mktVault', 'prcVault', 'orders', 'settleA', 'settleB',
+        ]
+        for (var i = 0; i < accountList.length; i++) {
+            accounts[accountList[i]] = marketAccounts[accountList[i]]
+        }
+        accounts['result'] = accounts['user']
+        const operationSpec = {
+            'accounts': accounts,
+        }
+        console.log(operationSpec)
+        var tx = new Transaction()
+        if (orderSpec['orderType'] === 'bid') {
+            if (orderSpec['matchType'] === 'limit') {
+                tx.add(this.program['aqua-dex'].instruction.limitBid(
+                    new BN(orderSpec['quantity']),
+                    new BN(orderSpec['price']),
+                    orderSpec['postOrder'],
+                    orderSpec['fillOrder'],
+                    new BN(0), // Expires
+                    false,     // Rollover
+                    operationSpec,
+                ))
+            } else if (orderSpec['matchType'] === 'market') {
+                if (orderSpec['byQuantity']) {
+                    orderSpec['netPrice'] = 0
+                } else {
+                    orderSpec['quantity'] = 0
+                }
+                tx.add(this.program['aqua-dex'].instruction.marketBid(
+                    new BN(orderSpec['byQuantity']),
+                    new BN(orderSpec['quantity']),
+                    new BN(orderSpec['netPrice']),
+                    orderSpec['fillOrder'],
+                    false,  // Rollover
+                    operationSpec,
+                ))
+            }
+        } else if (orderSpec['orderType'] === 'ask') {
+            if (orderSpec['matchType'] === 'limit') {
+                tx.add(this.program['aqua-dex'].instruction.limitAsk(
+                    new BN(orderSpec['quantity']),
+                    new BN(orderSpec['price']),
+                    orderSpec['postOrder'],
+                    orderSpec['fillOrder'],
+                    new BN(0), // Expires
+                    false,     // Rollover
+                    operationSpec,
+                ))
+            } else if (orderSpec['matchType'] === 'market') {
+                if (orderSpec['byQuantity']) {
+                    orderSpec['netPrice'] = 0
+                } else {
+                    orderSpec['quantity'] = 0
+                }
+                tx.add(this.program['aqua-dex'].instruction.marketAsk(
+                    new BN(orderSpec['byQuantity']),
+                    new BN(orderSpec['quantity']),
+                    new BN(orderSpec['netPrice']),
+                    orderSpec['fillOrder'],
+                    false,  // Rollover
+                    operationSpec,
+                ))
+            }
+        }
+        console.log('Sending transaction')
+        return await this.provider.sendAndConfirm(tx)
+    },
 }
