@@ -1,8 +1,5 @@
 <template>
     <v-card>
-        <v-card-title class="align-start">
-            <span>Trade</span>
-        </v-card-title>
         <v-card>
             <v-tabs v-model="tab" class="tab-index">
                 <v-tab v-for="item in items" :key="item">
@@ -84,7 +81,7 @@ export default {
         const tab = ref(0)
         const matchType = ref('limit')
         const fillTypeSelect = ref([
-            { 'value': 'post', 'text': 'Fill Any & Post Bid' }, // Fill: false, Post: true
+            { 'value': 'post', 'text': 'Fill Any & Post Order' }, // Fill: false, Post: true
             { 'value': 'partial', 'text': 'Fill Any & Do Not Post' }, // Fill: false, Post: false
             { 'value': 'fill', 'text': 'Fill Entire Order or Cancel' }, // Fill: true, Post: false
         ])

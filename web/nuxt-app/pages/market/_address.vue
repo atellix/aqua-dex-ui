@@ -3,7 +3,7 @@
         <v-col cols="12" md="8">
             <v-row no-gutter>
                 <v-col cols="12">
-                    <market-summary :data="marketSummary"></market-summary>
+                    <market-summary :market="marketSummary"></market-summary>
                 </v-col>
             </v-row>
             <v-row no-gutter>
@@ -35,7 +35,7 @@
             </v-row>
             <v-row no-gutter>
                 <v-col cols="12">
-                    <active-orders :data="tokenBalanceList" :market="marketSummary"></active-orders>
+                    <active-orders :market="marketSummary" :orders="orderbookData"></active-orders>
                 </v-col>
             </v-row>
         </v-col>
@@ -157,13 +157,9 @@ export default {
                             var bookData = $solana.decodeOrderBook(orderBook.data);
                             orderbookData.value = bookData;
                             console.log('Orderbook loaded');
-                            marketSummary.value = {
-                                'market': true,
-                                'marketReady': true,
-                                'mktTokenDecimals': new Number(marketData.mktDecimals),
-                                'prcTokenDecimals': new Number(marketData.prcDecimals),
-                                'mktTokenScale': 10 ** new Number(marketData.mktDecimals),
-                                'prcTokenScale': 10 ** new Number(marketData.prcDecimals),
+                            tokenBalanceList.value = {
+                                'mktTokenBalance': await $solana.getTokenBalance(marketData.mktMint, walletPK),
+                                'prcTokenBalance': await $solana.getTokenBalance(marketData.prcMint, walletPK),
                             };
                             const marketAgent = await $solana.programAddress([marketPK.toBuffer()], $solana.program['aqua-dex'].programId)
                             const marketAgentPK = new PublicKey(marketAgent.pubkey)
@@ -184,17 +180,19 @@ export default {
                                 'settleA': marketStateData.settleA,
                                 'settleB': marketStateData.settleB,
                             };
-                            tokenBalanceList.value = {
-                                'mktTokenBalance': await $solana.getTokenBalance(marketData.mktMint, walletPK),
-                                'prcTokenBalance': await $solana.getTokenBalance(marketData.prcMint, walletPK),
-                            };
                             $solana.provider.connection.onAccountChange(marketData.orders, (accountInfo, context) => {
-                                //console.log('Orderbook changed');
-                                //console.log(accountInfo);
                                 orderbookData.value = $solana.decodeOrderBook(accountInfo.data);
                                 console.log('Orderbook updated');
                             });
-                            //marketSummary.value['summary'] = $solana.loadMarket(route.params['market'])
+                            marketSummary.value = {
+                                'marketReady': true,
+                                'marketState': marketData.state,
+                                'userWallet': walletPK,
+                                'mktTokenDecimals': new Number(marketData.mktDecimals),
+                                'prcTokenDecimals': new Number(marketData.prcDecimals),
+                                'mktTokenScale': 10 ** new Number(marketData.mktDecimals),
+                                'prcTokenScale': 10 ** new Number(marketData.prcDecimals),
+                            };
                         }
                     }
                 }

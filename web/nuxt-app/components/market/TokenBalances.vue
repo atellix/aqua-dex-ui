@@ -1,7 +1,7 @@
 <template>
     <v-card>
         <v-card-title class="align-start">
-            <span>Token Balances</span>
+            <span>Balances</span>
         </v-card-title>
         <v-card-text>
             <v-list class="pb-0">

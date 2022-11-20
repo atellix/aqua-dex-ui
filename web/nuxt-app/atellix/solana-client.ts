@@ -345,6 +345,9 @@ export default {
         asks.sort(function(a, b) {
             return a.key.localeCompare(b.key)
         })
+        bids.sort(function(a, b) {
+            return b.key.localeCompare(a.key)
+        })
         return {
             'bids': bids,
             'asks': asks,
@@ -384,7 +387,7 @@ export default {
                     orderSpec['quantity'] = 0
                 }
                 tx.add(this.program['aqua-dex'].instruction.marketBid(
-                    new BN(orderSpec['byQuantity']),
+                    orderSpec['byQuantity'],
                     new BN(orderSpec['quantity']),
                     new BN(orderSpec['netPrice']),
                     orderSpec['fillOrder'],
@@ -410,7 +413,7 @@ export default {
                     orderSpec['quantity'] = 0
                 }
                 tx.add(this.program['aqua-dex'].instruction.marketAsk(
-                    new BN(orderSpec['byQuantity']),
+                    orderSpec['byQuantity'],
                     new BN(orderSpec['quantity']),
                     new BN(orderSpec['netPrice']),
                     orderSpec['fillOrder'],

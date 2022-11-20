@@ -1,8 +1,5 @@
 <template>
     <v-card>
-        <v-card-title>
-            <span class="me-3">Orderbook</span>
-        </v-card-title>
         <v-card-text>
             <v-row no-gutters>
                 <v-col cols="12" md="6" style="border-right: 1px solid grey;">
