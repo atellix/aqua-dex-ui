@@ -29,6 +29,57 @@
                     </div>
                 </v-list-item>
             </v-list>
+            <template v-if="settleFunds.unsettled">
+                <div class="mt-3">
+                    <v-divider></v-divider>
+                    <h3 class="mt-3">Unsettled Balances</h3>
+                    <v-list class="pb-0 mb-0">
+                        <template v-if="settleFunds.mktTokens">
+                            <v-list-item class="d-flex align-center px-0">
+                                <v-avatar color="info" size="25" class="info white--text font-weight-medium me-3">
+                                    <span class="text-base"> </span>
+                                </v-avatar>
+                                <div class="d-flex align-center flex-grow-1 flex-wrap">
+                                    <div class="me-2">
+                                        <div class="font-weight-semibold">
+                                            <span class="text--primary text-base me-1">{{ settleFunds.mktTokens }}</span>
+                                        </div>
+                                        <v-list-item-subtitle class="text-xs">
+                                            {{ tokenList[0].name }}
+                                        </v-list-item-subtitle>
+                                    </div>
+                                    <v-spacer></v-spacer>
+                                    <div>
+                                        <h4>{{ tokenList[0].symbol }}</h4>
+                                    </div>
+                                </div>
+                            </v-list-item>
+                        </template>
+                        <template v-if="settleFunds.prcTokens">
+                            <v-list-item class="d-flex align-center px-0">
+                                <v-avatar color="success" size="25" class="success white--text font-weight-medium me-3">
+                                    <span class="text-base"> </span>
+                                </v-avatar>
+                                <div class="d-flex align-center flex-grow-1 flex-wrap">
+                                    <div class="me-2">
+                                        <div class="font-weight-semibold">
+                                            <span class="text--primary text-base me-1">{{ settleFunds.prcTokens }}</span>
+                                        </div>
+                                        <v-list-item-subtitle class="text-xs">
+                                            {{ tokenList[1].name }}
+                                        </v-list-item-subtitle>
+                                    </div>
+                                    <v-spacer></v-spacer>
+                                    <div>
+                                        <h4>{{ tokenList[1].symbol }}</h4>
+                                    </div>
+                                </div>
+                            </v-list-item>
+                        </template>
+                    </v-list>
+                    <v-btn @click="settleTokens" text color="info">Withdraw Balances</v-btn>
+                </div>
+            </template>
         </v-card-text>
     </v-card>
 </template>
@@ -41,8 +92,14 @@ import $solana from '@/atellix/solana-client'
 
 export default {
     props: ['data', 'market'],
-    setup(props) {
+    setup(props, context) {
         const { market } = toRefs(props)
+        const settleFunds = ref({
+            'unsettled': false,
+            'mktTokens': '',
+            'prcTokens': '',
+        })
+        const settleList = ref([])
         const tokenList = ref([
             {
                 abbr: ' ',
@@ -74,6 +131,29 @@ export default {
             tkl[idx]['amount'] = bal
             return true
         }
+
+        const settlementEntries = async (firstLog) => {
+            var walletPK = props.market.userWallet
+            var nextLog = firstLog.toString()
+            var entries = []
+            do {
+                try {
+                    var logPK = new PublicKey(nextLog)
+                    var logInfo = await $solana.getAccountInfo(logPK)
+                    var logData = $solana.decodeSettlementLog(logInfo.data, walletPK)
+                    for (var i = 0; i < logData.entries.length; i++) {
+                        var entry = logData.entries[i]
+                        entry['log'] = logPK
+                        entries.push(entry)
+                    }
+                    nextLog = logData.header.next
+                } catch (error) {
+                    console.log('Error reading settlement logs: ' + error)
+                    nextLog = '11111111111111111111111111111111'
+                }
+            } while (nextLog !== '11111111111111111111111111111111')
+            settleList.value = entries
+        }
  
         var tokenUpdates = false
         watch([market], async (current, prev) => {
@@ -87,6 +167,7 @@ export default {
                 await Promise.all([
                     updateBalance(marketData.mktMint, walletPK, mktScale, mktDecimals, 0),
                     updateBalance(marketData.prcMint, walletPK, prcScale, prcDecimals, 1),
+                    settlementEntries(marketData.settle0),
                 ])
                 if (!tokenUpdates) {
                     tokenUpdates = true
@@ -99,10 +180,65 @@ export default {
                         await updateBalance(marketData.prcMint, walletPK, prcScale, prcDecimals, 1)
                     }); 
                 }
+
+                /*orderbookData.value = bookData
+                $solana.provider.connection.onAccountChange(marketData.orders, (accountInfo, context) => {
+                    orderbookData.value = $solana.decodeOrderBook(accountInfo.data)
+                    console.log('Orderbook updated')
+                });*/
             }
         })
+
+        watch(settleList, (current, prev) => {
+            //console.log('Settlement List')
+            //console.log(settleList.value)
+            var mt = 0
+            var pt = 0
+            for (var i = 0; i < settleList.value.length; i++) {
+                mt = mt + settleList.value[i].mkt_token_balance
+                pt = pt + settleList.value[i].prc_token_balance
+            }
+            if (mt > 0 || pt > 0) {
+                if (mt > 0) {
+                    mt = mt / market.value.mktTokenScale
+                    mt = mt.toLocaleString(undefined, {
+                        'minimumFractionDigits': market.value.mktTokenDecimals,
+                        'maximumFractionDigits': market.value.mktTokenDecimals,
+                    })
+                } else {
+                    mt = ''
+                }
+                if (pt > 0) {
+                    pt = pt / market.value.prcTokenScale
+                    pt = pt.toLocaleString(undefined, {
+                        'minimumFractionDigits': market.value.prcTokenDecimals,
+                        'maximumFractionDigits': market.value.prcTokenDecimals,
+                    })
+                } else {
+                    pt = ''
+                }
+                settleFunds.value = {
+                    'unsettled': true,
+                    'mktTokens': mt,
+                    'prcTokens': pt,
+                }
+            } else {
+                settleFunds.value = {
+                    'unsettled': false,
+                    'mktTokens': '',
+                    'prcTokens': '',
+                }
+            }
+        })
+
+        const settleTokens = () => {
+            context.emit('settleTokens', {'entries': settleList.value})
+        }
+
         return {
             tokenList,
+            settleFunds,
+            settleTokens,
             icons: {
                 mdiDotsVertical,
                 mdiChevronUp,

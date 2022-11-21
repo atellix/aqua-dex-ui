@@ -1,6 +1,6 @@
 <template>
     <v-card>
-        <vue-apex-charts :options="chartOptions" :series="chartData"></vue-apex-charts>
+        <!--<vue-apex-charts :options="chartOptions" :series="chartData"></vue-apex-charts>-->
     </v-card>
 </template>
 
