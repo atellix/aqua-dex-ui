@@ -64,7 +64,7 @@ export default {
 
         const updateBalance = async (mint, wallet, scale, decimals, idx) => {
             var tokens = await $solana.getTokenBalance(mint, wallet)
-            console.log(mint.toString() + ' ' + tokens + ' ' + scale + ' ' + decimals)
+            //console.log(mint.toString() + ' ' + tokens + ' ' + scale + ' ' + decimals)
             var bal = new Number(tokens / scale)
             bal = bal.toLocaleString(undefined, {
                 'minimumFractionDigits': decimals,

@@ -167,6 +167,14 @@ export default {
         zflist.reverse()
         return enc.write(new Uint8Array(zflist)).finalize()
     },
+    decodeOrderId(orderId) {
+        var dec = new base32.Decoder({ type: "crockford" })
+        var spec = dec.write(orderId).finalize()
+        var arr = new Uint8Array(spec)
+        var arrhex = [...arr].map(x => x.toString(16).padStart(2, '0')).join('')
+        var bgn = BigInt('0x' + arrhex)
+        return new BN(bgn.toString())
+    },
     decodeOrderNode(tag, blob) {
         var data
         if (tag === 0) {
@@ -302,7 +310,7 @@ export default {
         var orderBook = []
         for (var i = 0; i < mapData['nodes'].length; i++) {
             var node = mapData['nodes'][i]
-            console.log(side, node)
+            //console.log(side, node)
             if (node && node.tag === 2) {
                 var order = vecData['orders'][node.slot]
                 var orderItem = {
@@ -368,7 +376,7 @@ export default {
         const operationSpec = {
             'accounts': accounts,
         }
-        console.log(operationSpec)
+        //console.log(operationSpec)
         var tx = new Transaction()
         if (orderSpec['orderType'] === 'bid') {
             if (orderSpec['matchType'] === 'limit') {
@@ -423,6 +431,40 @@ export default {
                 ))
             }
         }
+        console.log('Sending transaction')
+        this.provider.opts['skipPreflight'] = true
+        return await this.provider.sendAndConfirm(tx)
+    },
+    async cancelOrder(marketAccounts, orderSpec) {
+        var accounts = {
+            'splTokenProg': TOKEN_PROGRAM_ID,
+        }
+        var accountList = [
+            'market', 'state', 'agent', 'user', 'userMktToken', 'userPrcToken', 'mktVault', 'prcVault', 'orders', 'settleA', 'settleB',
+        ]
+        for (var i = 0; i < accountList.length; i++) {
+            accounts[accountList[i]] = marketAccounts[accountList[i]]
+        }
+        accounts['owner'] = accounts['user']
+        accounts['result'] = accounts['user']
+        delete accounts['user']
+        const operationSpec = {
+            'accounts': accounts,
+        }
+        //console.log(operationSpec)
+        var tx = new Transaction()
+        var side
+        if (orderSpec['orderType'] === 'bid') {
+            side = 0
+        } else if (orderSpec['orderType'] === 'ask') {
+            side = 1
+        }
+        var orderId = this.decodeOrderId(orderSpec['orderId'])
+        tx.add(this.program['aqua-dex'].instruction.cancelOrder(
+            side,
+            orderId,
+            operationSpec
+        ))
         console.log('Sending transaction')
         this.provider.opts['skipPreflight'] = true
         return await this.provider.sendAndConfirm(tx)

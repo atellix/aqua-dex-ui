@@ -35,7 +35,7 @@
             </v-row>
             <v-row no-gutter>
                 <v-col cols="12">
-                    <active-orders :market="marketSummary" :orders="orderbookData"></active-orders>
+                    <active-orders :market="marketSummary" :orders="orderbookData" @cancelOrder="cancelOrder"></active-orders>
                 </v-col>
             </v-row>
         </v-col>
@@ -192,9 +192,15 @@ export default {
             console.log(orderSpec);
             console.log(await $solana.sendOrder(marketAccounts.value, orderSpec));
         }
+        const cancelOrder = async (cancelSpec) => {
+            console.log('Cancel Order:');
+            console.log(cancelSpec);
+            console.log(await $solana.cancelOrder(marketAccounts.value, cancelSpec));
+        }
 
         return {
             sendOrder,
+            cancelOrder,
             marketSummary,
             orderbookData,
         };

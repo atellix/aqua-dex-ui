@@ -31,7 +31,7 @@
                     <v-expand-transition>
                         <v-list-item v-if="showCancel == data.key" :class="`d-flex align-center px-0 ${index > 0 ? 'mt-4':''}`">
                             <v-card-text class="mb-0">
-                                <v-btn text color="error">Cancel Order</v-btn>
+                                <v-btn @click="cancelOrder(data.key, data.side)" text color="error">Cancel Order</v-btn>
                             </v-card-text>
                         </v-list-item>
                     </v-expand-transition>
@@ -50,7 +50,7 @@ import { mdiDotsVertical, mdiChevronUp, mdiChevronDown } from '@mdi/js'
 
 export default {
     props: ['orders', 'market'],
-    setup(props) {
+    setup(props, context) {
         const { orders, market } = toRefs(props)
         const showCancel = ref('')
         const orderList = ref([
@@ -107,11 +107,13 @@ export default {
                         var total = new Number(order.amount / current[1].mktTokenScale)
                         total = total * new Number(order.price / current[1].prcTokenScale)
                         item['name'] = 'Bid'
+                        item['side'] = 'bid'
                         item['color'] = 'success'
                         item['symbol'] = total.toFixed(2) + ' USDC'
                     } else if (order.type === 'ask') {
                         var total = new Number(order.amount / current[1].mktTokenScale)
                         item['name'] = 'Offer'
+                        item['side'] = 'ask'
                         item['color'] = 'info'
                         item['symbol'] = total.toFixed(2) + ' SOL'
                     }
@@ -120,9 +122,14 @@ export default {
                 orderList.value = itemList
             }
         })
+        const cancelOrder = (orderId, orderType) => {
+            context.emit('cancelOrder', {'orderId': orderId, 'orderType': orderType})
+        }
+
         return {
             orderList,
             showCancel,
+            cancelOrder,
             icons: {
                 mdiDotsVertical,
                 mdiChevronUp,

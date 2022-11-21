@@ -17,12 +17,12 @@
                                     <v-radio value="market" label="Market Bid"></v-radio>
                                 </v-radio-group>
                                 <template v-if="matchType == 'limit'">
-                                    <v-select v-model="fillType" :items="fillTypeSelect" label="Filling & Posting Mode"></v-select>
-                                    <v-text-field v-model="limitBidPrice" outlined dense persistent-hint label="Bid Price"></v-text-field>
+                                    <v-select v-model="fillType" :items="fillTypeSelect" label="Fill Mode"></v-select>
                                     <v-text-field v-model="limitBidQty" outlined dense persistent-hint label="Bid Quantity"></v-text-field>
+                                    <v-text-field v-model="limitBidPrice" outlined dense persistent-hint label="Bid Price"></v-text-field>
                                 </template>
                                 <template v-if="matchType == 'market'">
-                                    <v-select v-model="marketOrderType" :items="marketOrderTypeSelect" label="Filling Mode"></v-select>
+                                    <v-select v-model="marketOrderType" :items="marketOrderTypeSelect" label="Fill Mode"></v-select>
                                     <template v-if="marketOrderType == 'quantity' || marketOrderType == 'fill_quantity'">
                                         <v-text-field v-model="marketBidQty" outlined dense persistent-hint label="Quantity"></v-text-field>
                                     </template>
@@ -46,12 +46,12 @@
                                     <v-radio value="market" label="Market Offer"></v-radio>
                                 </v-radio-group>
                                 <template v-if="matchType == 'limit'">
-                                    <v-select v-model="fillType" :items="fillTypeSelect" label="Filling & Posting Mode"></v-select>
-                                    <v-text-field v-model="limitAskPrice" outlined dense persistent-hint label="Offer Price"></v-text-field>
+                                    <v-select v-model="fillType" :items="fillTypeSelect" label="Fill Mode"></v-select>
                                     <v-text-field v-model="limitAskQty" outlined dense persistent-hint label="Offer Quantity"></v-text-field>
+                                    <v-text-field v-model="limitAskPrice" outlined dense persistent-hint label="Offer Price"></v-text-field>
                                 </template>
                                 <template v-if="matchType == 'market'">
-                                    <v-select v-model="marketOrderType" :items="marketOrderTypeSelect" label="Filling Mode"></v-select>
+                                    <v-select v-model="marketOrderType" :items="marketOrderTypeSelect" label="Fill Mode"></v-select>
                                     <template v-if="marketOrderType == 'quantity' || marketOrderType == 'fill_quantity'">
                                         <v-text-field v-model="marketAskQty" outlined dense persistent-hint label="Quantity"></v-text-field>
                                     </template>
