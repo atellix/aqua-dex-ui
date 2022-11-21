@@ -36,11 +36,13 @@
 <script>
 import { watch, toRefs, ref } from '@vue/composition-api'
 import { mdiDotsVertical, mdiChevronUp, mdiChevronDown } from '@mdi/js'
+import { PublicKey } from '@solana/web3.js'
+import $solana from '@/atellix/solana-client'
 
 export default {
     props: ['data', 'market'],
     setup(props) {
-        const { data, market } = toRefs(props)
+        const { market } = toRefs(props)
         const tokenList = ref([
             {
                 abbr: ' ',
@@ -59,22 +61,44 @@ export default {
                 //change: '-6.2%',
             },
         ])
+
+        const updateBalance = async (mint, wallet, scale, decimals, idx) => {
+            var tokens = await $solana.getTokenBalance(mint, wallet)
+            console.log(mint.toString() + ' ' + tokens + ' ' + scale + ' ' + decimals)
+            var bal = new Number(tokens / scale)
+            bal = bal.toLocaleString(undefined, {
+                'minimumFractionDigits': decimals,
+                'maximumFractionDigits': decimals,
+            })
+            var tkl = tokenList.value
+            tkl[idx]['amount'] = bal
+            return true
+        }
  
-        watch([data, market], (current, prev) => {
-            if (current[1].marketReady) {
-                var mktBal = new Number(current[0].mktTokenBalance / current[1].mktTokenScale)
-                var prcBal = new Number(current[0].prcTokenBalance / current[1].prcTokenScale)
-                mktBal = mktBal.toLocaleString(undefined, {
-                    'minimumFractionDigits': current[1].mktTokenDecimals,
-                    'maximumFractionDigits': current[1].mktTokenDecimals,
-                })
-                prcBal = prcBal.toLocaleString(undefined, {
-                    'minimumFractionDigits': current[1].prcTokenDecimals,
-                    'maximumFractionDigits': current[1].prcTokenDecimals,
-                })
-                var tkl = tokenList.value
-                tkl[0]['amount'] = mktBal
-                tkl[1]['amount'] = prcBal
+        var tokenUpdates = false
+        watch([market], async (current, prev) => {
+            if (current[0].marketReady) {
+                var marketData = current[0].marketData
+                var walletPK = current[0].userWallet
+                var mktScale = current[0].mktTokenScale
+                var mktDecimals = current[0].mktTokenDecimals
+                var prcScale = current[0].prcTokenScale
+                var prcDecimals = current[0].prcTokenDecimals
+                await Promise.all([
+                    updateBalance(marketData.mktMint, walletPK, mktScale, mktDecimals, 0),
+                    updateBalance(marketData.prcMint, walletPK, prcScale, prcDecimals, 1),
+                ])
+                if (!tokenUpdates) {
+                    tokenUpdates = true
+                    const userToken1 = await $solana.associatedTokenAddress(walletPK, marketData.mktMint)
+                    const userToken2 = await $solana.associatedTokenAddress(walletPK, marketData.prcMint)
+                    $solana.provider.connection.onAccountChange(new PublicKey(userToken1.pubkey), async (accountInfo, context) => {
+                        await updateBalance(marketData.mktMint, walletPK, mktScale, mktDecimals, 0)
+                    }); 
+                    $solana.provider.connection.onAccountChange(new PublicKey(userToken2.pubkey), async (accountInfo, context) => {
+                        await updateBalance(marketData.prcMint, walletPK, prcScale, prcDecimals, 1)
+                    }); 
+                }
             }
         })
         return {

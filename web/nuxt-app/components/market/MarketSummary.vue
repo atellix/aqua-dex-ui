@@ -76,9 +76,10 @@ export default {
         watch(market, async (current, prev) => {
             if (current.marketReady) {
                 if (!updateEvents) {
-                    var startData = await $solana.program['aqua-dex'].account.marketState.fetch(props.market.marketState)
+                    var marketStatePK = current.marketData.state
+                    var startData = await $solana.program['aqua-dex'].account.marketState.fetch(marketStatePK)
                     updateStats(startData)
-                    updateEvents = $solana.program['aqua-dex'].account.marketState.subscribe(props.market.marketState)
+                    updateEvents = $solana.program['aqua-dex'].account.marketState.subscribe(marketStatePK)
                     updateEvents.on('change', (acctSpec) => {
                         updateStats(acctSpec)
                     })

@@ -76,7 +76,7 @@ import { watch, toRefs, ref } from '@vue/composition-api'
 import { mdiDotsVertical, mdiChevronUp, mdiChevronDown } from '@mdi/js'
 
 export default {
-    props: ['data', 'market'],
+    props: ['market'],
     setup(props, context) {
         const tab = ref(0)
         const matchType = ref('limit')

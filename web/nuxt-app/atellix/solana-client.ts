@@ -302,6 +302,7 @@ export default {
         var orderBook = []
         for (var i = 0; i < mapData['nodes'].length; i++) {
             var node = mapData['nodes'][i]
+            console.log(side, node)
             if (node && node.tag === 2) {
                 var order = vecData['orders'][node.slot]
                 var orderItem = {
@@ -423,6 +424,7 @@ export default {
             }
         }
         console.log('Sending transaction')
+        this.provider.opts['skipPreflight'] = true
         return await this.provider.sendAndConfirm(tx)
     },
 }

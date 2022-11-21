@@ -8,7 +8,7 @@
             </v-row>
             <v-row no-gutter>
                 <v-col cols="12">
-                    <dashboard-weekly-overview></dashboard-weekly-overview>
+                    <chart-view></chart-view>
                 </v-col>
             </v-row>
             <v-row no-gutter>
@@ -16,21 +16,21 @@
                     <orderbook-view :data="orderbookData" :market="marketSummary"></orderbook-view>
                 </v-col>
             </v-row>
-            <v-row no-gutter>
+            <!--<v-row no-gutter>
                 <v-col cols="12">
                     <dashboard-datatable></dashboard-datatable>
                 </v-col>
-            </v-row>
+            </v-row>-->
         </v-col>
         <v-col cols="12" md="4">
             <v-row no-gutter>
                 <v-col cols="12">
-                    <token-balances :data="tokenBalanceList" :market="marketSummary"></token-balances>
+                    <token-balances :market="marketSummary"></token-balances>
                 </v-col>
             </v-row>
             <v-row no-gutter>
                 <v-col cols="12">
-                    <order-entry :data="tokenBalanceList" :market="marketSummary" @sendOrder="sendOrder"></order-entry>
+                    <order-entry :market="marketSummary" @sendOrder="sendOrder"></order-entry>
                 </v-col>
             </v-row>
             <v-row no-gutter>
@@ -58,6 +58,7 @@ import Emitter from 'tiny-emitter';
 import bs58 from 'bs58';
 
 import MarketSummary from "@/components/market/MarketSummary.vue";
+import ChartView from "@/components/market/ChartView.vue";
 import OrderbookView from "@/components/market/OrderbookView.vue";
 import TokenBalances from "@/components/market/TokenBalances.vue";
 import ActiveOrders from "@/components/market/ActiveOrders.vue";
@@ -65,9 +66,6 @@ import OrderEntry from "@/components/market/OrderEntry.vue";
 
 // demos
 import DashboardCongratulationJohn from "@/components/dashboard/DashboardCongratulationJohn.vue";
-import DashboardCardTotalEarning from "@/components/dashboard/DashboardCardTotalEarning.vue";
-import DashboardCardDepositAndWithdraw from "@/components/dashboard/DashboardCardDepositAndWithdraw.vue";
-import DashboardWeeklyOverview from "@/components/dashboard/DashboardWeeklyOverview.vue";
 import DashboardDatatable from "@/components/dashboard/DashboardDatatable.vue";
 
 export default {
@@ -77,11 +75,9 @@ export default {
         TokenBalances,
         OrderEntry,
         ActiveOrders,
+        ChartView,
         StatisticsCardVertical,
         DashboardCongratulationJohn,
-        DashboardCardTotalEarning,
-        DashboardCardDepositAndWithdraw,
-        DashboardWeeklyOverview,
         DashboardDatatable,
     },
     layout: "Content",
@@ -90,10 +86,6 @@ export default {
         const marketSummary = ref({});
         const marketAccounts = ref({});
         const orderbookData = ref({});
-        const tokenBalanceList = ref({
-            'mktTokenBalance': '0',
-            'prcTokenBalance': '0',
-        });
         const walletConnected = ref(false);
         const walletProcessing = ref(false);
         const walletIcon = ref(false);
@@ -156,11 +148,11 @@ export default {
                             var orderBook = await $solana.getAccountInfo(marketData.orders);
                             var bookData = $solana.decodeOrderBook(orderBook.data);
                             orderbookData.value = bookData;
+                            $solana.provider.connection.onAccountChange(marketData.orders, (accountInfo, context) => {
+                                orderbookData.value = $solana.decodeOrderBook(accountInfo.data);
+                                console.log('Orderbook updated');
+                            });
                             console.log('Orderbook loaded');
-                            tokenBalanceList.value = {
-                                'mktTokenBalance': await $solana.getTokenBalance(marketData.mktMint, walletPK),
-                                'prcTokenBalance': await $solana.getTokenBalance(marketData.prcMint, walletPK),
-                            };
                             const marketAgent = await $solana.programAddress([marketPK.toBuffer()], $solana.program['aqua-dex'].programId)
                             const marketAgentPK = new PublicKey(marketAgent.pubkey)
                             const tokenVault1 = await $solana.associatedTokenAddress(marketAgentPK, marketData.mktMint)
@@ -180,13 +172,9 @@ export default {
                                 'settleA': marketStateData.settleA,
                                 'settleB': marketStateData.settleB,
                             };
-                            $solana.provider.connection.onAccountChange(marketData.orders, (accountInfo, context) => {
-                                orderbookData.value = $solana.decodeOrderBook(accountInfo.data);
-                                console.log('Orderbook updated');
-                            });
                             marketSummary.value = {
                                 'marketReady': true,
-                                'marketState': marketData.state,
+                                'marketData': marketData,
                                 'userWallet': walletPK,
                                 'mktTokenDecimals': new Number(marketData.mktDecimals),
                                 'prcTokenDecimals': new Number(marketData.prcDecimals),
@@ -209,7 +197,6 @@ export default {
             sendOrder,
             marketSummary,
             orderbookData,
-            tokenBalanceList,
         };
     },
     /*async asyncData({ params, redirect }) {
