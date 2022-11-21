@@ -651,4 +651,31 @@ export default {
         this.provider.opts['skipPreflight'] = true
         return await this.provider.sendAndConfirm(tx)
     },
+    async withdrawTokens(marketAccounts, withdrawSpec) {
+        var entries = withdrawSpec.logEntries
+        var tx = new Transaction()
+        for (var i = 0; i < entries.length; i++) {
+            var accounts = {
+                'splTokenProg': TOKEN_PROGRAM_ID,
+                'settle': entries[i].log,
+            }
+            var accountList = [
+                'market', 'state', 'agent', 'user', 'userMktToken', 'userPrcToken', 'mktVault', 'prcVault',
+            ]
+            for (var i = 0; i < accountList.length; i++) {
+                accounts[accountList[i]] = marketAccounts[accountList[i]]
+            }
+            accounts['owner'] = accounts['user']
+            accounts['result'] = accounts['user']
+            delete accounts['user']
+            const operationSpec = {
+                'accounts': accounts,
+            }
+            //console.log(operationSpec)
+            tx.add(this.program['aqua-dex'].instruction.withdraw(operationSpec))
+        }
+        console.log('Sending transaction')
+        this.provider.opts['skipPreflight'] = true
+        return await this.provider.sendAndConfirm(tx)
+    },
 }

@@ -25,7 +25,7 @@
         <v-col cols="12" md="4">
             <v-row no-gutter>
                 <v-col cols="12">
-                    <token-balances :market="marketSummary"></token-balances>
+                    <token-balances :market="marketSummary" @settleTokens="settlementWithdraw"></token-balances>
                 </v-col>
             </v-row>
             <v-row no-gutter>
@@ -197,10 +197,16 @@ export default {
             console.log(cancelSpec);
             console.log(await $solana.cancelOrder(marketAccounts.value, cancelSpec));
         }
+        const settlementWithdraw = async (withdrawSpec) => {
+            console.log('Withdraw Tokens:');
+            console.log(withdrawSpec);
+            console.log(await $solana.withdrawTokens(marketAccounts.value, withdrawSpec));
+        }
 
         return {
             sendOrder,
             cancelOrder,
+            settlementWithdraw,
             marketSummary,
             orderbookData,
         };

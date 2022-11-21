@@ -77,7 +77,7 @@
                             </v-list-item>
                         </template>
                     </v-list>
-                    <v-btn @click="settleTokens" text color="info">Withdraw Balances</v-btn>
+                    <v-btn @click="settleTokens" text color="info">Withdraw</v-btn>
                 </div>
             </template>
         </v-card-text>
@@ -135,11 +135,13 @@ export default {
         const settlementEntries = async (firstLog) => {
             var walletPK = props.market.userWallet
             var nextLog = firstLog.toString()
+            var logAccounts = []
             var entries = []
             do {
                 try {
                     var logPK = new PublicKey(nextLog)
                     var logInfo = await $solana.getAccountInfo(logPK)
+                    logAccounts.push(logPK)
                     var logData = $solana.decodeSettlementLog(logInfo.data, walletPK)
                     for (var i = 0; i < logData.entries.length; i++) {
                         var entry = logData.entries[i]
@@ -153,9 +155,11 @@ export default {
                 }
             } while (nextLog !== '11111111111111111111111111111111')
             settleList.value = entries
+            return logAccounts
         }
  
         var tokenUpdates = false
+        var logUpdates = {}
         watch([market], async (current, prev) => {
             if (current[0].marketReady) {
                 var marketData = current[0].marketData
@@ -164,7 +168,7 @@ export default {
                 var mktDecimals = current[0].mktTokenDecimals
                 var prcScale = current[0].prcTokenScale
                 var prcDecimals = current[0].prcTokenDecimals
-                await Promise.all([
+                var results = await Promise.all([
                     updateBalance(marketData.mktMint, walletPK, mktScale, mktDecimals, 0),
                     updateBalance(marketData.prcMint, walletPK, prcScale, prcDecimals, 1),
                     settlementEntries(marketData.settle0),
@@ -180,12 +184,17 @@ export default {
                         await updateBalance(marketData.prcMint, walletPK, prcScale, prcDecimals, 1)
                     }); 
                 }
-
-                /*orderbookData.value = bookData
-                $solana.provider.connection.onAccountChange(marketData.orders, (accountInfo, context) => {
-                    orderbookData.value = $solana.decodeOrderBook(accountInfo.data)
-                    console.log('Orderbook updated')
-                });*/
+                var logAccounts = results[2]
+                for (var i = 0; i < logAccounts.length; i++) {
+                    var k = logAccounts[i].toString()
+                    if (!logUpdates[k]) {
+                        logUpdates[k] = true
+                        $solana.provider.connection.onAccountChange(logAccounts[i], async (accountInfo, context) => {
+                            console.log('Updated Settlement Log: ' + k)
+                            await settlementEntries(marketData.settle0)
+                        })
+                    }
+                }
             }
         })
 
@@ -232,7 +241,7 @@ export default {
         })
 
         const settleTokens = () => {
-            context.emit('settleTokens', {'entries': settleList.value})
+            context.emit('settleTokens', {'logEntries': settleList.value})
         }
 
         return {
