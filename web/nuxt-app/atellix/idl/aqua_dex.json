@@ -57,6 +57,11 @@
           "isSigner": false
         },
         {
+          "name": "tradeLog",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "orders",
           "isMut": true,
           "isSigner": false
@@ -212,6 +217,11 @@
           "isSigner": false
         },
         {
+          "name": "tradeLog",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "settleA",
           "isMut": true,
           "isSigner": false
@@ -304,6 +314,11 @@
         },
         {
           "name": "orders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tradeLog",
           "isMut": true,
           "isSigner": false
         },
@@ -404,6 +419,11 @@
           "isSigner": false
         },
         {
+          "name": "tradeLog",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "settleA",
           "isMut": true,
           "isSigner": false
@@ -492,6 +512,11 @@
         },
         {
           "name": "orders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tradeLog",
           "isMut": true,
           "isSigner": false
         },
@@ -1263,6 +1288,10 @@
             "type": "publicKey"
           },
           {
+            "name": "tradeLog",
+            "type": "publicKey"
+          },
+          {
             "name": "agent",
             "type": "publicKey"
           },
@@ -1348,6 +1377,10 @@
           },
           {
             "name": "actionCounter",
+            "type": "u64"
+          },
+          {
+            "name": "tradeCounter",
             "type": "u64"
           },
           {
@@ -1627,6 +1660,11 @@
           "index": false
         },
         {
+          "name": "tradeId",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "market",
           "type": "publicKey",
           "index": false
@@ -1664,6 +1702,11 @@
         {
           "name": "price",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "ts",
+          "type": "i64",
           "index": false
         }
       ]

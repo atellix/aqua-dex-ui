@@ -20,6 +20,9 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr v-if="data.bids.length == 0">
+                                    <td class="text-center" colspan="3"><em>(None)</em></td>
+                                </tr>
                                 <tr v-for="item in data.bids" :key="item.key">
                                     <td class="text-right">
                                         {{ item.owner.substring(0, 4) }}...{{ item.owner.substring(item.owner.length - 4, item.owner.length) }}
@@ -53,6 +56,9 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr v-if="data.asks.length == 0">
+                                    <td class="text-center" colspan="3"><em>(None)</em></td>
+                                </tr>
                                 <tr v-for="item in data.asks" :key="item.key">
                                     <td class="text-left">
                                         {{ (new Number(item.price / market.prcTokenScale)).toFixed(4) }}

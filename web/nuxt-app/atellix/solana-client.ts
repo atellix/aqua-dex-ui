@@ -544,12 +544,88 @@ export default {
         result['entries'] = settlementEntries
         return result
     },
+    decodeTradeLogVec(pageTableEntry, pages) {
+        const headerSize = pageTableEntry['header_size']
+        const offsetSize = pageTableEntry['offset_size']
+        const stLogEntry = lo.struct([
+            lo.blob(16, 'event_type'),
+            lo.nu64('action_id'),
+            lo.nu64('trade_id'),
+            lo.blob(16, 'maker_order_id'),
+            lo.u8('maker_filled'),
+            lo.blob(32, 'maker'),
+            lo.blob(32, 'taker'),
+            lo.u8('taker_side'),
+            lo.nu64('amount'),
+            lo.nu64('price'),
+            lo.ns64('ts'),
+        ])
+        const instPerPage = Math.floor((16384 - (headerSize + offsetSize)) / stLogEntry.span)
+        const stSlabVec = lo.struct([
+            lo.blob(offsetSize),
+            lo.nu64('trade_count'),
+            lo.nu64('entry_max'),
+            lo.seq(stLogEntry, instPerPage, 'logs'),
+        ])
+        var totalPages = Math.floor(pageTableEntry['alloc_items'] / instPerPage)
+        if ((pageTableEntry['alloc_items'] % instPerPage) !== 0) {
+            totalPages = totalPages + 1
+        }
+        var vecPages = []
+        for (var p = 0; p < totalPages; p++) {
+            var pidx = pageTableEntry['alloc_pages'][p]
+            vecPages.push(pages[pidx])
+        }
+        var logSpec = {
+            'logs': [],
+        }
+        for (var i = 0; i < vecPages.length; i++) {
+            var res = stSlabVec.decode(vecPages[i])
+            if (i === 0) {
+                logSpec['trade_count'] = res['trade_count']
+                logSpec['entry_max'] = res['entry_max']
+            }
+            for (var logIdx = 0; logIdx < res['logs'].length; logIdx++) {
+                var item = res['logs'][logIdx]
+                if (item['trade_id'] === 0) {
+                    continue
+                }
+                item['event_type'] = (new BN(item['event_type'])).toString()
+                item['maker_order_id'] = this.encodeOrderId(item['maker_order_id'])
+                item['maker'] = new PublicKey(item['maker']).toString()
+                item['taker'] = new PublicKey(item['taker']).toString()
+                logSpec['logs'].push(item)
+                if (logSpec['logs'].length === pageTableEntry['alloc_items']) {
+                    i = vecPages.length
+                    break
+                }
+            }
+        }
+        logSpec.logs.reverse()
+        return logSpec
+    },
+    decodeTradeLog(data) {
+        const stTypedPage = lo.struct([
+            lo.nu64('header_size'),
+            lo.nu64('offset_size'),
+            lo.nu64('alloc_items'),
+            lo.seq(lo.u16('page_index'), 128, 'alloc_pages'), // TYPE_MAX_PAGES
+        ]);
+        const stSlabAlloc = lo.struct([
+            lo.u16('top_unused_page'),
+            lo.seq(stTypedPage, 16, 'type_page'), // TYPE_MAX
+            lo.seq(lo.blob(16384), 4, 'pages'), // PAGE_SIZE
+        ]);
+        var res = stSlabAlloc.decode(data)
+        var logVec = res['type_page'][0]
+        return this.decodeTradeLogVec(logVec, res['pages'])
+    },
     async sendOrder(marketAccounts, orderSpec) {
         var accounts = {
             'splTokenProg': TOKEN_PROGRAM_ID,
         }
         var accountList = [
-            'market', 'state', 'agent', 'user', 'userMktToken', 'userPrcToken', 'mktVault', 'prcVault', 'orders', 'settleA', 'settleB',
+            'market', 'state', 'agent', 'user', 'userMktToken', 'userPrcToken', 'mktVault', 'prcVault', 'orders', 'tradeLog', 'settleA', 'settleB',
         ]
         for (var i = 0; i < accountList.length; i++) {
             accounts[accountList[i]] = marketAccounts[accountList[i]]

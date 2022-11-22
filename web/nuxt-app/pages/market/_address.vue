@@ -16,11 +16,11 @@
                     <orderbook-view :data="orderbookData" :market="marketSummary"></orderbook-view>
                 </v-col>
             </v-row>
-            <!--<v-row no-gutter>
+            <v-row no-gutter>
                 <v-col cols="12">
-                    <dashboard-datatable></dashboard-datatable>
+                    <trade-log :market="marketSummary"></trade-log>
                 </v-col>
-            </v-row>-->
+            </v-row>
         </v-col>
         <v-col cols="12" md="4">
             <v-row no-gutter>
@@ -50,7 +50,6 @@ import {
     mdiCurrencyUsd,
     mdiHelpCircleOutline,
 } from "@mdi/js";
-import StatisticsCardVertical from "@/components/statistics-card/StatisticsCardVertical.vue";
 import { ref, onMounted } from '@vue/composition-api';
 import { PublicKey } from '@solana/web3.js';
 import $solana from '@/atellix/solana-client';
@@ -63,10 +62,10 @@ import OrderbookView from "@/components/market/OrderbookView.vue";
 import TokenBalances from "@/components/market/TokenBalances.vue";
 import ActiveOrders from "@/components/market/ActiveOrders.vue";
 import OrderEntry from "@/components/market/OrderEntry.vue";
+import TradeLog from "@/components/market/TradeLog.vue";
 
 // demos
 import DashboardCongratulationJohn from "@/components/dashboard/DashboardCongratulationJohn.vue";
-import DashboardDatatable from "@/components/dashboard/DashboardDatatable.vue";
 
 export default {
     components: {
@@ -76,9 +75,8 @@ export default {
         OrderEntry,
         ActiveOrders,
         ChartView,
-        StatisticsCardVertical,
+        TradeLog,
         DashboardCongratulationJohn,
-        DashboardDatatable,
     },
     layout: "Content",
     setup(props, context) {
@@ -169,6 +167,7 @@ export default {
                                 'mktVault': new PublicKey(tokenVault1.pubkey),
                                 'prcVault': new PublicKey(tokenVault2.pubkey), 
                                 'orders': marketData.orders,
+                                'tradeLog': marketData.tradeLog,
                                 'settleA': marketStateData.settleA,
                                 'settleB': marketStateData.settleB,
                             };
