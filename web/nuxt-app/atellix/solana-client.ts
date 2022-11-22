@@ -544,7 +544,7 @@ export default {
         result['entries'] = settlementEntries
         return result
     },
-    decodeTradeLogVec(pageTableEntry, pages) {
+    decodeTradeLogVec(pageTableEntry, pages, maxItems) {
         const headerSize = pageTableEntry['header_size']
         const offsetSize = pageTableEntry['offset_size']
         const stLogEntry = lo.struct([
@@ -601,10 +601,13 @@ export default {
                 }
             }
         }
-        logSpec.logs.reverse()
+        logSpec.logs = logSpec.logs.sort((a, b) => { return b.trade_id - a.trade_id })
+        if (maxItems && logSpec.logs.length > maxItems) {
+            logSpec.logs = logSpec.logs.slice(0, maxItems)
+        }
         return logSpec
     },
-    decodeTradeLog(data) {
+    decodeTradeLog(data, maxItems = null) {
         const stTypedPage = lo.struct([
             lo.nu64('header_size'),
             lo.nu64('offset_size'),
@@ -618,7 +621,7 @@ export default {
         ]);
         var res = stSlabAlloc.decode(data)
         var logVec = res['type_page'][0]
-        return this.decodeTradeLogVec(logVec, res['pages'])
+        return this.decodeTradeLogVec(logVec, res['pages'], maxItems)
     },
     async sendOrder(marketAccounts, orderSpec) {
         var accounts = {
