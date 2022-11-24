@@ -11,6 +11,20 @@ services:
     networks:
       - net3
 
+  timescaledb:
+    image: timescale/timescaledb:latest-pg14
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - "tsdata:/home/postgres/pgdata/data"
+    env_file: .env
+    networks:
+      - net3
+
+volumes:
+  tsdata:
+
 networks:
   net3:
     external: true

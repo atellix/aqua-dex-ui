@@ -15,10 +15,10 @@
             </template>
             <template #[`item.taker_side`]="{item}">
                 <template v-if="item.taker_side == 0">
-                    <v-chip small color="success" class="font-weight-medium">Bid</v-chip>
+                    <strong>Bid</strong>
                 </template>
                 <template v-else>
-                    <v-chip small color="info" class="font-weight-medium">Offer</v-chip>
+                    <strong>Offer</strong>
                 </template>
             </template>
         </v-data-table>
