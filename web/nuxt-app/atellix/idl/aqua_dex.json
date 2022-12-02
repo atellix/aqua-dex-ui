@@ -3,15 +3,56 @@
   "name": "aqua_dex",
   "instructions": [
     {
-      "name": "version",
+      "name": "storeMetadata",
       "accounts": [
         {
-          "name": "result",
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "programData",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "programAdmin",
           "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "programInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "inpProgramName",
+          "type": "string"
+        },
+        {
+          "name": "inpDeveloperName",
+          "type": "string"
+        },
+        {
+          "name": "inpDeveloperUrl",
+          "type": "string"
+        },
+        {
+          "name": "inpSourceUrl",
+          "type": "string"
+        },
+        {
+          "name": "inpVerifyUrl",
+          "type": "string"
+        }
+      ]
     },
     {
       "name": "createMarket",
@@ -264,6 +305,10 @@
           "type": "i64"
         },
         {
+          "name": "inpPreview",
+          "type": "bool"
+        },
+        {
           "name": "inpRollover",
           "type": "bool"
         }
@@ -365,6 +410,10 @@
           "type": "i64"
         },
         {
+          "name": "inpPreview",
+          "type": "bool"
+        },
+        {
           "name": "inpRollover",
           "type": "bool"
         }
@@ -462,6 +511,10 @@
           "type": "bool"
         },
         {
+          "name": "inpPreview",
+          "type": "bool"
+        },
+        {
           "name": "inpRollover",
           "type": "bool"
         }
@@ -556,6 +609,10 @@
         },
         {
           "name": "inpFill",
+          "type": "bool"
+        },
+        {
+          "name": "inpPreview",
           "type": "bool"
         },
         {
@@ -899,10 +956,7 @@
           "isSigner": false
         }
       ],
-      "args": [],
-      "returns": {
-        "defined": "LogStatusResult"
-      }
+      "args": []
     },
     {
       "name": "managerTransferSol",
@@ -1243,6 +1297,50 @@
   ],
   "accounts": [
     {
+      "name": "ProgramMetadata",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "semvarMajor",
+            "type": "u32"
+          },
+          {
+            "name": "semvarMinor",
+            "type": "u32"
+          },
+          {
+            "name": "semvarPatch",
+            "type": "u32"
+          },
+          {
+            "name": "program",
+            "type": "publicKey"
+          },
+          {
+            "name": "programName",
+            "type": "string"
+          },
+          {
+            "name": "developerName",
+            "type": "string"
+          },
+          {
+            "name": "developerUrl",
+            "type": "string"
+          },
+          {
+            "name": "sourceUrl",
+            "type": "string"
+          },
+          {
+            "name": "verifyUrl",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
       "name": "Market",
       "type": {
         "kind": "struct",
@@ -1533,26 +1631,6 @@
           }
         ]
       }
-    },
-    {
-      "name": "SemverRelease",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "major",
-            "type": "u32"
-          },
-          {
-            "name": "minor",
-            "type": "u32"
-          },
-          {
-            "name": "patch",
-            "type": "u32"
-          }
-        ]
-      }
     }
   ],
   "types": [
@@ -1640,6 +1718,71 @@
           },
           {
             "name": "Account"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ErrorCode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AccessDenied"
+          },
+          {
+            "name": "TokenAccountFrozen"
+          },
+          {
+            "name": "InsufficientTokens"
+          },
+          {
+            "name": "MarketClosed"
+          },
+          {
+            "name": "AccountNotFound"
+          },
+          {
+            "name": "RecordNotFound"
+          },
+          {
+            "name": "OrderNotFound"
+          },
+          {
+            "name": "InvalidParameters"
+          },
+          {
+            "name": "InvalidAccount"
+          },
+          {
+            "name": "InvalidDerivedAccount"
+          },
+          {
+            "name": "VaultNotEmpty"
+          },
+          {
+            "name": "OrderNotFilled"
+          },
+          {
+            "name": "InternalError"
+          },
+          {
+            "name": "ExternalError"
+          },
+          {
+            "name": "SettlementLogFull"
+          },
+          {
+            "name": "SettlementLogNotEmpty"
+          },
+          {
+            "name": "OrderbookFull"
+          },
+          {
+            "name": "RetrySettlementAccount"
+          },
+          {
+            "name": "Overflow"
           }
         ]
       }
@@ -2125,93 +2268,6 @@
           "index": false
         }
       ]
-    }
-  ],
-  "errors": [
-    {
-      "code": 6000,
-      "name": "AccessDenied",
-      "msg": "Access denied"
-    },
-    {
-      "code": 6001,
-      "name": "MarketClosed",
-      "msg": "Market closed"
-    },
-    {
-      "code": 6002,
-      "name": "AccountNotFound",
-      "msg": "Account not found"
-    },
-    {
-      "code": 6003,
-      "name": "RecordNotFound",
-      "msg": "Record not found"
-    },
-    {
-      "code": 6004,
-      "name": "OrderNotFound",
-      "msg": "Order not found"
-    },
-    {
-      "code": 6005,
-      "name": "InvalidParameters",
-      "msg": "Invalid parameters"
-    },
-    {
-      "code": 6006,
-      "name": "InvalidAccount",
-      "msg": "Invalid account"
-    },
-    {
-      "code": 6007,
-      "name": "InvalidDerivedAccount",
-      "msg": "Invalid derived account"
-    },
-    {
-      "code": 6008,
-      "name": "VaultNotEmpty",
-      "msg": "Vault not empty"
-    },
-    {
-      "code": 6009,
-      "name": "OrderNotFilled",
-      "msg": "Order not filled"
-    },
-    {
-      "code": 6010,
-      "name": "InternalError",
-      "msg": "Internal error"
-    },
-    {
-      "code": 6011,
-      "name": "ExternalError",
-      "msg": "External error"
-    },
-    {
-      "code": 6012,
-      "name": "SettlementLogFull",
-      "msg": "Settlement log full"
-    },
-    {
-      "code": 6013,
-      "name": "SettlementLogNotEmpty",
-      "msg": "Settlement log not empty"
-    },
-    {
-      "code": 6014,
-      "name": "OrderbookFull",
-      "msg": "Orderbook full"
-    },
-    {
-      "code": 6015,
-      "name": "RetrySettlementAccount",
-      "msg": "Settlement log account does not match market, please update market data and retry"
-    },
-    {
-      "code": 6016,
-      "name": "Overflow",
-      "msg": "Overflow"
     }
   ],
   "metadata": {

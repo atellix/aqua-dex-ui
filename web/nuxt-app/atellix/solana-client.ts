@@ -449,7 +449,8 @@ export default {
         const offsetSize = pageTableEntry['offset_size']
         const stEntry = lo.struct([
             lo.nu64('mkt_token_balance'),
-            lo.ns64('prc_token_balance'),
+            lo.nu64('prc_token_balance'),
+            lo.ns64('ts_updated'),
         ])
         const instPerPage = Math.floor((16384 - (headerSize + offsetSize)) / stEntry.span)
         const stSlabVec = lo.struct([
@@ -536,6 +537,7 @@ export default {
                         'owner': node['owner'],
                         'mkt_token_balance': entry['mkt_token_balance'],
                         'prc_token_balance': entry['prc_token_balance'],
+                        'ts_updated': entry['ts_updated'],
                     }
                     settlementEntries.push(entryItem)
                 }
@@ -647,6 +649,7 @@ export default {
                     orderSpec['postOrder'],
                     orderSpec['fillOrder'],
                     new BN(0), // Expires
+                    false,     // Preview
                     false,     // Rollover
                     operationSpec,
                 ))
@@ -661,6 +664,7 @@ export default {
                     new BN(orderSpec['quantity']),
                     new BN(orderSpec['netPrice']),
                     orderSpec['fillOrder'],
+                    false,  // Preview
                     false,  // Rollover
                     operationSpec,
                 ))
@@ -673,6 +677,7 @@ export default {
                     orderSpec['postOrder'],
                     orderSpec['fillOrder'],
                     new BN(0), // Expires
+                    false,     // Preview
                     false,     // Rollover
                     operationSpec,
                 ))
@@ -687,6 +692,7 @@ export default {
                     new BN(orderSpec['quantity']),
                     new BN(orderSpec['netPrice']),
                     orderSpec['fillOrder'],
+                    false,  // Preview
                     false,  // Rollover
                     operationSpec,
                 ))
