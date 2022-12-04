@@ -8,7 +8,7 @@
             </v-row>
             <v-row no-gutter>
                 <v-col cols="12">
-                    <chart-view></chart-view>
+                    <chart-view :market="marketSummary"></chart-view>
                 </v-col>
             </v-row>
             <v-row no-gutter>
