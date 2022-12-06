@@ -53,7 +53,7 @@ export default {
         }
 
         var logUpdates = false
-        var logMax = 25
+        var logMax = 10 
         watch([market], async (current, prev) => {
             if (current[0].marketReady) {
                 var tradeLogPK = current[0].marketData.tradeLog

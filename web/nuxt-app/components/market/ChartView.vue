@@ -36,7 +36,7 @@ export default {
             },
             xaxis: {
                 type: 'datetime',
-                range: (24 * 60 * 60 * 1000),
+                range: (60 * 60 * 1000),
             },
             yaxis: {
                 tooltip: {
@@ -46,9 +46,10 @@ export default {
         }
 
         var chartData = ref([ { data: [] } ])
-        var loadData = async (vr, cd, sc) => {
+        var loadData = async (vr, cd, sc, m) => {
             var url = 'https://aqua-dev1.atellix.net:8000/v1/history'
-            var res = await axios.post(url, {})
+            console.log('Request history: ' + m)
+            var res = await axios.post(url, JSON.stringify({ 'market': m }), { 'Content-Type': 'application/json' })
             if (res.status === 200 && res.data.result === 'ok') {
                 var list = []
                 for (var i = 0; i < res.data.history.length; i++) {
@@ -80,10 +81,10 @@ export default {
         watch([market], async (current, prev) => {
             if (current[0].marketReady) {
                 var prcScale = current[0].prcTokenScale
-                await loadData(viewRefs, chartData, prcScale)
+                await loadData(viewRefs, chartData, prcScale, current[0].marketAddr)
                 setInterval(async () => {
-                    console.log('Reloading chart data')
-                    await loadData(viewRefs, chartData, prcScale)
+                    console.log('Reloading chart data: ' + current[0].marketAddr)
+                    await loadData(viewRefs, chartData, prcScale, current[0].marketAddr)
                 }, 60000)
             }
         })

@@ -173,6 +173,7 @@ export default {
                             };
                             marketSummary.value = {
                                 'marketReady': true,
+                                'marketAddr': marketAddr,
                                 'marketData': marketData,
                                 'userWallet': walletPK,
                                 'mktTokenDecimals': new Number(marketData.mktDecimals),
