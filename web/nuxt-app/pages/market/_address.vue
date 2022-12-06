@@ -81,7 +81,9 @@ export default {
     layout: "Content",
     setup(props, context) {
         const eventbus = new Emitter();
-        const marketSummary = ref({});
+        const marketSummary = ref({
+            'marketLoading': true
+        });
         const marketAccounts = ref({});
         const orderbookData = ref({});
         const walletConnected = ref(false);
@@ -172,6 +174,7 @@ export default {
                                 'settleB': marketStateData.settleB,
                             };
                             marketSummary.value = {
+                                'marketLoading': false,
                                 'marketReady': true,
                                 'marketAddr': marketAddr,
                                 'marketData': marketData,

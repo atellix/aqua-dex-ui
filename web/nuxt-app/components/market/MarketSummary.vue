@@ -1,11 +1,21 @@
 <template>
     <v-card v-if="!market.marketReady">
-        <v-card-title class="align-start">
-            <span class="font-weight-semibold">Market Not Found</span>
-        </v-card-title>
-        <v-card-text>
+        <template v-if="market.marketLoading">
+            <v-card-title class="align-start">
+                <span class="font-weight-semibold">Market Loading...</span>
+            </v-card-title>
+            <v-card-text>
+                Loading market data
+            </v-card-text>
+        </template>
+        <template v-else>
+            <v-card-title class="align-start">
+                <span class="font-weight-semibold">Market Not Found</span>
+            </v-card-title>
+            <v-card-text>
                 Please navigate to a valid market
-        </v-card-text>
+            </v-card-text>
+        </template>
     </v-card>
     <v-card v-else>
         <v-card-title class="align-start">
