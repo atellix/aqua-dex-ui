@@ -35,7 +35,7 @@ export default {
                 title: 'SOL / USDC',
                 subtitle: 'Solana SOL / USD Coin',
                 color: 'primary',
-                address: '6attyhCFqY1ZZqeRp3eQWnCf5QFViAgaHtYtck7y7CD',
+                address: 'CHnFnUi4eCsY6ZVVF3p8tkkr19U1JZE5rQPtWV5NMB6z',
             },
         ]
         return {

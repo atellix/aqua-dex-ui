@@ -184,6 +184,10 @@
           "type": "i64"
         },
         {
+          "name": "inpMinQuantity",
+          "type": "u64"
+        },
+        {
           "name": "inpTakerFee",
           "type": "u32"
         },
@@ -1020,6 +1024,10 @@
           "type": "i64"
         },
         {
+          "name": "inpMinQuantity",
+          "type": "u64"
+        },
+        {
           "name": "inpTakerFee",
           "type": "u32"
         },
@@ -1364,6 +1372,10 @@
           {
             "name": "expireMin",
             "type": "i64"
+          },
+          {
+            "name": "minQuantity",
+            "type": "u64"
           },
           {
             "name": "logFee",
@@ -1780,6 +1792,9 @@
           },
           {
             "name": "RetrySettlementAccount"
+          },
+          {
+            "name": "QuantityBelowMinimum"
           },
           {
             "name": "Overflow"
