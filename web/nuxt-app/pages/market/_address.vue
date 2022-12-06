@@ -176,6 +176,7 @@ export default {
                             marketSummary.value = {
                                 'marketLoading': false,
                                 'marketReady': true,
+                                'marketTitle': 'SOL/USDC',
                                 'marketAddr': marketAddr,
                                 'marketData': marketData,
                                 'userWallet': walletPK,

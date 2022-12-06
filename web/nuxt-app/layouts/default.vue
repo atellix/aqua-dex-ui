@@ -6,10 +6,7 @@
             <div class="boxed-container w-full">
                 <div class="d-flex align-center mx-6">
                     <!-- Left Content -->
-                    <v-app-bar-nav-icon
-                        class="d-block d-lg-none me-2"
-                        @click="isDrawerOpen = !isDrawerOpen"
-                    ></v-app-bar-nav-icon>
+                    <v-app-bar-nav-icon class="d-block d-lg-none me-2" @click="isDrawerOpen = !isDrawerOpen"></v-app-bar-nav-icon>
 
                     <v-spacer></v-spacer>
 

@@ -3,10 +3,8 @@
         <!-- Navigation Header -->
         <div class="vertical-nav-header d-flex items-center ps-6 pe-5 pt-5 pb-2">
             <nuxt-link to="/" class="d-flex align-center text-decoration-none">
-                <v-img :src="require('@/assets/images/logos/logo.svg')" max-height="30px" max-width="30px" alt="logo" contain eager class="app-logo me-3"></v-img>
-                <v-slide-x-transition>
-                    <h2 class="app-title text--primary">MATERIO</h2>
-                </v-slide-x-transition>
+                <v-img v-if="!$vuetify.theme.dark" :src="require('@/assets/images/atellix/aquadex-logo-1.png')" max-height="36px" max-width="150px" alt="logo" contain eager class="app-logo me-3"></v-img>
+                <v-img v-else :src="require('@/assets/images/atellix/aquadex-logo-2.png')" max-height="36px" max-width="150px" alt="logo" contain eager class="app-logo me-3"></v-img>
             </nuxt-link>
         </div>
 

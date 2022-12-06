@@ -2,11 +2,9 @@
     <v-card v-if="!market.marketReady">
         <template v-if="market.marketLoading">
             <v-card-title class="align-start">
-                <span class="font-weight-semibold">Market Loading...</span>
+                <span class="font-weight-semibold">Market loading...</span>
             </v-card-title>
-            <v-card-text>
-                Loading market data
-            </v-card-text>
+            <v-card-text>&nbsp;</v-card-text>
         </template>
         <template v-else>
             <v-card-title class="align-start">
@@ -19,10 +17,10 @@
     </v-card>
     <v-card v-else>
         <v-card-title class="align-start">
-            <span class="font-weight-semibold">Market</span>
+            <span class="font-weight-semibold">{{ market.marketTitle }}</span>
         </v-card-title>
         <v-card-subtitle class="mb-0 mt-n5">
-            <span class="font-weight-semibold text--primary me-1">Aqua DEX protocol</span>
+            <span class="font-weight-semibold text--primary me-1">AquaDEX protocol</span>
             <span>Solana blockchain</span>
         </v-card-subtitle>
         <v-card-text>

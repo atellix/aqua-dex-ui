@@ -72,15 +72,6 @@ export default {
     // customVariables: ["~/assets/variables.scss"],
     theme: {
       themes: {
-        light: {
-          primary: "#9155FD",
-          accent: "#0d6efd",
-          secondary: "#8A8D93",
-          success: "#56CA00",
-          info: "#16B1FF",
-          warning: "#FFB400",
-          error: "#FF4C51",
-        },
         dark: {
           primary: "#9155FD",
           accent: "#0d6efd",
@@ -89,6 +80,22 @@ export default {
           info: "#16B1FF",
           warning: "#FFB400",
           error: "#FF4C51",
+        },
+        light: {
+          primary: "#009688",
+          secondary: "#03a9f4",
+          accent: "#00bcd4",
+          error: "#f44336",
+          warning: "#ff9800",
+          info: "#3f51b5",
+          success: "#4caf50",
+          /*primary: "#9155FD",
+          accent: "#0d6efd",
+          secondary: "#8A8D93",
+          success: "#56CA00",
+          info: "#16B1FF",
+          warning: "#FFB400",
+          error: "#FF4C51",*/
         },
       },
     },
