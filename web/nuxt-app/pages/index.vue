@@ -14,8 +14,13 @@ export default {
         MarketList,
     },
     layout: "Content",
+    head() {
+        return {
+            title: 'AquaDEX Markets'
+        }
+    },
     setup() {
-        return {};
+        return {}
     },
 };
 </script>

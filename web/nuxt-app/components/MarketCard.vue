@@ -1,0 +1,84 @@
+<template>
+    <v-card>
+        <div>
+            <v-divider :vertical="$vuetify.breakpoint.mdAndUp"></v-divider>
+            <v-row>
+                <v-col cols="4" sm="12" md="4" lg="4" align="center">
+                    <router-link :to="'/market/' + marketInfo.address"><v-img class="mr-3 ml-3 mt-3 mb-3" max-width="300" :src="marketInfo.image"></v-img></router-link>
+                </v-col>
+                <v-col cols="8" sm="12" md="8" lg="8">
+                    <v-card-title>
+                        {{ marketInfo.title }}
+                    </v-card-title>
+                    <v-card-subtitle class="text-no-wrap">
+                        {{ marketInfo.subtitle }}
+                    </v-card-subtitle>
+                    <v-card-actions class="d-flex justify-space-between dense">
+                        <router-link :to="'/market/' + marketInfo.address" custom v-slot="{ navigate }">
+                            <v-btn small color="primary" @click="navigate" role="link"> 
+                                Access Market &raquo;
+                            </v-btn>
+                        </router-link>
+                        <v-btn icon>
+                            <v-icon>{{ icons.mdiShareVariantOutline }}</v-icon>
+                        </v-btn>
+                    </v-card-actions>
+                    <v-card-text>
+                        {{ marketInfo.description }}
+                        <template v-if="marketInfo.coingecko">
+                        </template>
+                    </v-card-text>
+                    <v-card-text v-if="marketInfo.link" class="text--primary text-base">
+                        <a :href="'https://' + marketInfo.link" target="_blank">{{ marketInfo.link }}</a>
+                    </v-card-text>
+                    <v-card-text v-if="marketInfo.coingecko">
+                        <div class="mt-3">
+                            <a :href="'https://' + marketInfo.coingecko" target="_blank"><v-img height="37" width="130" :src="require('@/assets/images/atellix/coingecko-logo-1.png')"></v-img></a>
+                        </div>
+                    </v-card-text>
+                </v-col>
+            </v-row>
+        </div>
+    </v-card>
+</template>
+<script>
+import { mdiShareVariantOutline } from '@mdi/js'
+
+export default {
+    props: ['marketInfo'],
+    setup() {
+        return {
+            icons: { mdiShareVariantOutline },
+        }
+    },
+}
+</script>
+<style lang="scss" scoped>
+.greeting-card {
+    position: relative;
+    .greeting-card-bg {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+    .greeting-card-trophy {
+        position: absolute;
+        bottom: 10%;
+        right: 8%;
+    }
+}
+// rtl
+.v-application {
+    &.v-application--is-rtl {
+        .greeting-card-bg {
+            right: initial;
+            left: 0;
+            transform: rotateY(180deg);
+        }
+        .greeting-card-trophy {
+            left: 8%;
+            right: initial;
+        }
+    }
+}
+</style>

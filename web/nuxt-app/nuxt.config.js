@@ -17,8 +17,8 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: "%s - materio-nuxt",
-    title: "materio-nuxt",
+    titleTemplate: "%s",
+    title: "AquaDEX",
     htmlAttrs: {
       lang: "en",
     },
