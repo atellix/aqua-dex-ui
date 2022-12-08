@@ -326,7 +326,7 @@ export default {
         }
         return orderBook
     },
-    decodeOrderBook(data) {
+    decodeOrderBook(data, limit) {
         const stTypedPage = lo.struct([
             lo.nu64('header_size'),
             lo.nu64('offset_size'),
@@ -357,6 +357,12 @@ export default {
         bids.sort(function(a, b) {
             return b.key.localeCompare(a.key)
         })
+        if (asks.length > limit) {
+            asks = asks.slice(0, limit)
+        }
+        if (bids.length > limit) {
+            bids = bids.slice(0, limit)
+        }
         return {
             'bids': bids,
             'asks': asks,

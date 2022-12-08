@@ -11,7 +11,6 @@
         <!-- Navigation Items -->
         <v-list expand shaped class="vertical-nav-menu-items pr-5">
             <nav-menu-link title="Markets" to="/" :icon="icons.mdiHomeOutline"></nav-menu-link>
-            <nav-menu-link title="Token Accounts" to="/tokens" :icon="icons.mdiAccountCogOutline"></nav-menu-link>
         </v-list>
     </v-navigation-drawer>
 </template>

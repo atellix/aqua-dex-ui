@@ -146,7 +146,7 @@ export default {
                             var marketStateData = await $solana.getAccountData('aqua-dex', 'marketState', marketData.state);
                             //console.log(marketStateData);
                             var orderBook = await $solana.getAccountInfo(marketData.orders);
-                            var bookData = $solana.decodeOrderBook(orderBook.data);
+                            var bookData = $solana.decodeOrderBook(orderBook.data, 10);
                             orderbookData.value = bookData;
                             $solana.provider.connection.onAccountChange(marketData.orders, (accountInfo, context) => {
                                 orderbookData.value = $solana.decodeOrderBook(accountInfo.data);
