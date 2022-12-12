@@ -4,7 +4,7 @@
             <span>Trade History</span>
         </v-card-title>
         <template v-if="showHistory">
-            <v-simple-table dense>
+            <v-simple-table dense :height="55 + (43 * tradeList.length)">
                 <template v-slot:default>
                     <thead>
                         <tr>
@@ -21,10 +21,13 @@
                                 Quantity
                             </th>
                             <th>
-                                Net
+                                Net&nbsp;Price
                             </th>
                             <th>
                                 Fee
+                            </th>
+                            <th>
+                                &nbsp;
                             </th>
                         </tr>
                     </thead>
@@ -34,7 +37,7 @@
                         </tr>
                         <tr v-for="trade in tradeList" :key="trade.data.tradeId" class="orderbook-row">
                             <td>
-                                {{ trade.ts }}
+                                {{ trade.ts }} 
                             </td>
                             <td>
                                 <template v-if="trade.role == 'maker'">
@@ -71,15 +74,25 @@
                                     {{ (new Number(0)).toFixed(4) }}
                                 </template>
                             </td>
+                            <td>
+                                <a :href="trade.link" target="_blank"><v-icon size="20">
+                                    {{ icons.mdiLinkBoxVariantOutline }}
+                                </v-icon></a>
+                            </td>
                         </tr>
                     </tbody>
                 </template>
             </v-simple-table>
+            <div class="text-center">
+                <v-pagination v-model="currentPage" :length="totalPages" :total-visible="7"></v-pagination>
+            </div>
         </template>
     </v-card>
 </template>
 
 <script>
+// eslint-disable-next-line object-curly-newline
+import { mdiLinkBoxVariantOutline } from '@mdi/js'
 import { ref, toRefs, watch } from '@vue/composition-api'
 import { DateTime } from 'luxon'
 import axios from 'axios'
@@ -90,6 +103,8 @@ export default {
     setup(props, context) {
         const { market } = toRefs(props)
 
+        const totalPages = ref(1)
+        const currentPage = ref(1)
         const showHistory = ref(false)
         const tradeList = ref([])
         const loadLastTx = async (market, user) => {
@@ -103,18 +118,26 @@ export default {
             }
             return ''
         }
-        const loadTradeHistory = async (market, user) => {
+        const loadTradeHistory = async (market, user, page) => {
             var url = 'https://aqua-dev1.atellix.net:8000/v1/trades'
             var res = await axios.post(url, JSON.stringify({
                 'market': market,
                 'user': user,
+                'page': page,
             }), { 'Content-Type': 'application/json' })
             var result = []
+            var devnet = true
+            var limit = 10
             if (res.status === 200 && res.data.result === 'ok') {
+                totalPages.value = 1 + Math.floor(res.data.count / limit)
                 for (var i = 0; i < res.data.trades.length; i++) {
                     var item = res.data.trades[i]
                     var lastDt = DateTime.fromISO(item.ts)
-                    item.ts = lastDt.toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)
+                    item.ts = lastDt.toLocaleString(DateTime.DATETIME_SHORT)
+                    item.link = 'https://explorer.solana.com/tx/' + item.sig
+                    if (devnet) {
+                        item.link = item.link + '?cluster=devnet'
+                    }
                     result.push(item)
                 }
             }
@@ -124,23 +147,36 @@ export default {
         watch([market], async (current, prev) => {
             if (current[0].marketReady) {
                 showHistory.value = true
-                var market = current[0].marketAddr
+                var mkt = current[0].marketAddr
                 var user = current[0].userWallet
-                tradeList.value = await loadTradeHistory(market, user)
-                var lastTx = await loadLastTx(market, user)
+                tradeList.value = await loadTradeHistory(mkt, user, currentPage.value)
+                var lastTx = await loadLastTx(mkt, user)
                 setInterval(async () => {
-                    var nextTx = await loadLastTx(market, user)
+                    var nextTx = await loadLastTx(mkt, user)
                     if (nextTx !== lastTx) {
                         lastTx = nextTx
-                        tradeList.value = await loadTradeHistory(market, user)
+                        tradeList.value = await loadTradeHistory(mkt, user, currentPage.value)
                     }
                 }, 60000)
             }
         })
+        watch([currentPage], async (current, prev) => {
+            if (market.value.marketReady) {
+                var mkt = market.value.marketAddr
+                var user = market.value.userWallet
+                tradeList.value = await loadTradeHistory(mkt, user, current[0])
+            }
+        })
 
         return {
+            currentPage,
+            totalPages,
             showHistory,
             tradeList,
+
+            icons: {
+                mdiLinkBoxVariantOutline,
+            },
         }
     },
 }

@@ -1,8 +1,10 @@
 <template>
     <v-card>
         <template v-if="showChart">
-            <v-select v-model="chartView" :items="chartViewList" item-value="id" item-text="name" label="Candlesticks"/>
-            <vue-apex-charts :options="chartOptions" :series="chartData" ref="apexChart"></vue-apex-charts>
+            <v-select v-model="chartView" :items="chartViewList" item-value="id" item-text="name" label="Candlesticks" class="mr-3 ml-3"/>
+            <div class="mr-3">
+                <vue-apex-charts :options="chartOptions" :series="chartData" ref="apexChart"></vue-apex-charts>
+            </div>
         </template>
     </v-card>
 </template>
@@ -104,12 +106,17 @@ export default {
                 }
                 list.reverse()
                 cd.value[0].data = list
-                vr.apexChart.updateOptions({
-                    xaxis: {
-                        range: chartViewRange[v],
-                    }
-                })
-                vr.apexChart.updateSeries(cd.value)
+                try {
+                    vr.apexChart.updateOptions({
+                        xaxis: {
+                            range: chartViewRange[v],
+                        }
+                    })
+                    vr.apexChart.updateSeries(cd.value)
+                } catch (error) {
+                    console.log('ApexCharts Error')
+                    console.log(error)
+                }
             }
         }
 

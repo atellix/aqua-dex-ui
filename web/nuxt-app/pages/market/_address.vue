@@ -226,19 +226,34 @@ export default {
         });
 
         const sendOrder = async (orderSpec) => {
-            console.log('Send Order:');
-            console.log(orderSpec);
-            console.log(await $solana.sendOrder(marketAccounts.value, orderSpec));
+            try {
+                console.log('Send Order:');
+                console.log(orderSpec);
+                console.log(await $solana.sendOrder(marketAccounts.value, orderSpec));
+            } catch (error) {
+                console.log('Solana Transaction Failed:');
+                console.log(error)
+            }
         }
         const cancelOrder = async (cancelSpec) => {
-            console.log('Cancel Order:');
-            console.log(cancelSpec);
-            console.log(await $solana.cancelOrder(marketAccounts.value, cancelSpec));
+            try {
+                console.log('Cancel Order:');
+                console.log(cancelSpec);
+                console.log(await $solana.cancelOrder(marketAccounts.value, cancelSpec));
+            } catch (error) {
+                console.log('Solana Transaction Failed:');
+                console.log(error)
+            }
         }
         const settlementWithdraw = async (withdrawSpec) => {
-            console.log('Withdraw Tokens:');
-            console.log(withdrawSpec);
-            console.log(await $solana.withdrawTokens(marketAccounts.value, withdrawSpec));
+            try {
+                console.log('Withdraw Tokens:');
+                console.log(withdrawSpec);
+                console.log(await $solana.withdrawTokens(marketAccounts.value, withdrawSpec));
+            } catch (error) {
+                console.log('Solana Transaction Failed:');
+                console.log(error)
+            }
         }
 
         return {
