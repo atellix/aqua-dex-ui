@@ -331,12 +331,12 @@ export default {
             lo.nu64('header_size'),
             lo.nu64('offset_size'),
             lo.nu64('alloc_items'),
-            lo.seq(lo.u16('page_index'), 128, 'alloc_pages'), // TYPE_MAX_PAGES
+            lo.seq(lo.u16('page_index'), 16, 'alloc_pages'), // TYPE_MAX_PAGES
         ]);
         const stSlabAlloc = lo.struct([
             lo.u16('top_unused_page'),
-            lo.seq(stTypedPage, 16, 'type_page'), // TYPE_MAX
-            lo.seq(lo.blob(16384), 4, 'pages'), // PAGE_SIZE
+            lo.seq(stTypedPage, 4, 'type_page'), // TYPE_MAX
+            lo.seq(lo.blob(16384), 6, 'pages'), // PAGE_SIZE
         ]);
         var res = stSlabAlloc.decode(data)
         //console.log(JSON.stringify(res['type_page']))
@@ -504,12 +504,12 @@ export default {
             lo.nu64('header_size'),
             lo.nu64('offset_size'),
             lo.nu64('alloc_items'),
-            lo.seq(lo.u16('page_index'), 128, 'alloc_pages'), // TYPE_MAX_PAGES
+            lo.seq(lo.u16('page_index'), 16, 'alloc_pages'), // TYPE_MAX_PAGES
         ]);
         const stSlabAlloc = lo.struct([
             lo.seq(stAccountsHeader, 1, 'header'),
             lo.u16('top_unused_page'),
-            lo.seq(stTypedPage, 16, 'type_page'), // TYPE_MAX
+            lo.seq(stTypedPage, 4, 'type_page'), // TYPE_MAX
             lo.seq(lo.blob(16384), 6, 'pages'), // PAGE_SIZE
         ]);
         var res = stSlabAlloc.decode(data)
@@ -620,12 +620,12 @@ export default {
             lo.nu64('header_size'),
             lo.nu64('offset_size'),
             lo.nu64('alloc_items'),
-            lo.seq(lo.u16('page_index'), 128, 'alloc_pages'), // TYPE_MAX_PAGES
+            lo.seq(lo.u16('page_index'), 16, 'alloc_pages'), // TYPE_MAX_PAGES
         ]);
         const stSlabAlloc = lo.struct([
             lo.u16('top_unused_page'),
-            lo.seq(stTypedPage, 16, 'type_page'), // TYPE_MAX
-            lo.seq(lo.blob(16384), 4, 'pages'), // PAGE_SIZE
+            lo.seq(stTypedPage, 4, 'type_page'), // TYPE_MAX
+            lo.seq(lo.blob(16384), 1, 'pages'), // PAGE_SIZE
         ]);
         var res = stSlabAlloc.decode(data)
         var logVec = res['type_page'][0]

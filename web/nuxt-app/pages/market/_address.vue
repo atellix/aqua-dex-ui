@@ -38,6 +38,11 @@
                     <active-orders :market="marketSummary" :orders="orderbookData" @cancelOrder="cancelOrder"></active-orders>
                 </v-col>
             </v-row>
+            <v-row no-gutter>
+                <v-col cols="12">
+                    <trade-history :market="marketSummary"></trade-history>
+                </v-col>
+            </v-row>
         </v-col>
     </v-row>
 </template>
@@ -63,6 +68,7 @@ import TokenBalances from "@/components/market/TokenBalances.vue";
 import ActiveOrders from "@/components/market/ActiveOrders.vue";
 import OrderEntry from "@/components/market/OrderEntry.vue";
 import TradeLog from "@/components/market/TradeLog.vue";
+import TradeHistory from "@/components/market/TradeHistory.vue";
 
 // demos
 import DashboardCongratulationJohn from "@/components/dashboard/DashboardCongratulationJohn.vue";
@@ -76,13 +82,41 @@ export default {
         ActiveOrders,
         ChartView,
         TradeLog,
+        TradeHistory,
         DashboardCongratulationJohn,
     },
     layout: "Content",
+    head() {
+        return {
+            title: this.pageHead.pageTitle,
+            meta:[
+                { hid: 'description', name: 'description', content:  this.pageHead.description },
+                { hid: 'og:title', property: 'og:title', content: this.pageHead.pageTitle },
+                { hid: 'og:url', property: 'og:url', content: this.pageHead.pageUrl },
+                { hid: 'og:description', property: 'og:description', content: this.pageHead.description },
+                //{ hid: 'og:image', property: 'og:image', content: process.env.baseUrl + ogImage},
+                
+                // twitter card
+                { hid: "twitter:title", name: "twitter:title", content: this.pageHead.pageTitle },
+                { hid: "twitter:url", name: "twitter:url", content: this.pageHead.pageUrl },
+                { hid: 'twitter:description', name: 'twitter:description', content: this.pageHead.description },
+                //{ hid: "twitter:image", name: "twitter:image", content: process.env.baseUrl + ogImage},
+            ],
+            link: [
+                { hid: "canonical", rel: "canonical", href: this.pageHead.pageUrl },
+            ]
+        }
+    },
     setup(props, context) {
         const eventbus = new Emitter();
         const marketSummary = ref({
             'marketLoading': true
+        });
+        const pageHead = ref({
+            'pageTitle': 'SOL / USDC (Dev)',
+            'pageUrl': window.location.href,
+            //'pageImage': 
+            'description': 'Solana SPL Token swap market'
         });
         const marketAccounts = ref({});
         const orderbookData = ref({});
@@ -208,6 +242,7 @@ export default {
         }
 
         return {
+            pageHead,
             sendOrder,
             cancelOrder,
             settlementWithdraw,

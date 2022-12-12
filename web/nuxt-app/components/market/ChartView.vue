@@ -32,7 +32,7 @@ export default {
                 type: 'candlestick',
                 width: '100vw',
                 toolbar: {
-                    show: true
+                    show: false
                 },
             },
             xaxis: {

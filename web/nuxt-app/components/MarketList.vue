@@ -18,7 +18,7 @@ export default {
                 image: require('@/assets/images/atellix/ATLX-token-1.png'),
                 title: 'ATLX / USDC',
                 subtitle: 'Atellix / USD Coin',
-                address: 'CHnFnUi4eCsY6ZVVF3p8tkkr19U1JZE5rQPtWV5NMB6z',
+                address: 'FbptMDz6ZGMQSSwtdL3YG4HdBWcUApYZfySjweEXm8Zz',
                 link: 'Atellix.Network',
                 description: 'Atellix.Network: Building next-generation markets on blockchain. Creators of Virtual USD, the AquaDEX protocol, and AtellixPay. The ATLX token is the governance token for the Atellix DAO. See terms and conditions for details.',
             },
