@@ -94,6 +94,7 @@ export default {
             let programPK = new PublicKey(ANCHOR_IDL[programKey]['metadata']['address'])
             this.program[programKey] = new Program(ANCHOR_IDL[programKey], programPK)
         }
+        return this.program[programKey]
     },
     async getAccountData(programKey, accountType, accountPK) {
         let provider = this.provider
@@ -748,25 +749,64 @@ export default {
         for (var i = 0; i < entries.length; i++) {
             var accounts = {
                 'splTokenProg': TOKEN_PROGRAM_ID,
-                'settle': entries[i].log,
             }
             var accountList = [
                 'market', 'state', 'agent', 'user', 'userMktToken', 'userPrcToken', 'mktVault', 'prcVault',
             ]
-            for (var i = 0; i < accountList.length; i++) {
-                accounts[accountList[i]] = marketAccounts[accountList[i]]
+            for (var j = 0; j < accountList.length; j++) {
+                accounts[accountList[j]] = marketAccounts[accountList[j]]
             }
-            accounts['owner'] = accounts['user']
             accounts['result'] = accounts['user']
+            accounts['owner'] = accounts['user']
             delete accounts['user']
-            const operationSpec = {
-                'accounts': accounts,
+            if (entries[i].vault) {
+                accounts['vault'] = entries[i].vault
+                const operationSpec = {
+                    'accounts': accounts,
+                }
+                tx.add(this.program['aqua-dex'].instruction.vaultWithdraw(operationSpec))
+            } else {
+                accounts['settle'] = entries[i].log
+                if (entries[i].prev.toString() !== '11111111111111111111111111111111') {
+                    accounts['settlePrev'] = entries[i].prev
+                } else {
+                    accounts['settlePrev'] = entries[i].log
+                }
+                if (entries[i].next.toString() !== '11111111111111111111111111111111') {
+                    accounts['settleNext'] = entries[i].next
+                } else {
+                    accounts['settleNext'] = entries[i].log
+                }
+                const operationSpec = {
+                    'accounts': accounts,
+                }
+                //console.log(operationSpec)
+                tx.add(this.program['aqua-dex'].instruction.withdraw(operationSpec))
             }
-            //console.log(operationSpec)
-            tx.add(this.program['aqua-dex'].instruction.withdraw(operationSpec))
         }
         console.log('Sending transaction')
         this.provider.opts['skipPreflight'] = true
         return await this.provider.sendAndConfirm(tx)
     },
+    async getUserVault(market, user) {
+        const aquadex = this.loadProgram('aqua-dex')
+        const aquadexPK = new PublicKey(ANCHOR_IDL['aqua-dex']['metadata']['address'])
+        const vault = await this.programAddress([market.toBuffer(), user.toBuffer()], aquadexPK)
+        try {
+            const pk = new PublicKey(vault.pubkey)
+            const vt = await aquadex.account.userVault.fetch(pk)
+            if (vt && vt.initialized) {
+                const res = {
+                    'mktTokens': vt.mktTokens.toString(),
+                    'prcTokens': vt.prcTokens.toString(),
+                    'publicKey': pk,
+                }
+                return res
+            }
+        } catch (error) {
+            //console.log(error)
+            return null
+        }
+        return null
+    }
 }

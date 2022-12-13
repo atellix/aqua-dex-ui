@@ -99,6 +99,7 @@ export default {
             'mktTokens': '',
             'prcTokens': '',
         })
+        const userVault = ref(null)
         const settleList = ref([])
         const tokenList = ref([
             {
@@ -134,9 +135,21 @@ export default {
 
         const settlementEntries = async (firstLog) => {
             var walletPK = props.market.userWallet
+
             var nextLog = firstLog.toString()
             var logAccounts = []
             var entries = []
+
+            var vault = await $solana.getUserVault(new PublicKey(market.value.marketAddr), walletPK)
+            if (vault) {
+                logAccounts.push(vault.publicKey)
+                entries.push({
+                    'vault': vault.publicKey,
+                    'mkt_token_balance': new Number(vault.mktTokens),
+                    'prc_token_balance': new Number(vault.prcTokens),
+                })
+            }
+
             do {
                 try {
                     var logPK = new PublicKey(nextLog)
@@ -146,6 +159,8 @@ export default {
                     for (var i = 0; i < logData.entries.length; i++) {
                         var entry = logData.entries[i]
                         entry['log'] = logPK
+                        entry['prev'] = new PublicKey(logData.header.prev)
+                        entry['next'] = new PublicKey(logData.header.next)
                         entries.push(entry)
                     }
                     nextLog = logData.header.next
@@ -157,7 +172,7 @@ export default {
             settleList.value = entries
             return logAccounts
         }
- 
+
         var tokenUpdates = false
         var logUpdates = {}
         watch([market], async (current, prev) => {
@@ -190,7 +205,7 @@ export default {
                     if (!logUpdates[k]) {
                         logUpdates[k] = true
                         $solana.provider.connection.onAccountChange(logAccounts[i], async (accountInfo, context) => {
-                            console.log('Updated Settlement Log: ' + k)
+                            console.log('Updated Settlement Log')
                             await settlementEntries(marketData.settle0)
                         })
                     }

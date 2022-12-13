@@ -129,7 +129,10 @@ export default {
             var devnet = true
             var limit = 10
             if (res.status === 200 && res.data.result === 'ok') {
-                totalPages.value = 1 + Math.floor(res.data.count / limit)
+                totalPages.value = Math.floor(res.data.count / limit)
+                if (res.data.count % limit !== 0) {
+                    totalPages.value = totalPages.value + 1
+                }
                 for (var i = 0; i < res.data.trades.length; i++) {
                     var item = res.data.trades[i]
                     var lastDt = DateTime.fromISO(item.ts)
