@@ -1,4 +1,4 @@
-import { PublicKey, Keypair, Connection, Transaction, SystemProgram, clusterApiUrl } from '@solana/web3.js'
+import { PublicKey, Keypair, Connection, Transaction, SystemProgram, ComputeBudgetProgram, clusterApiUrl } from '@solana/web3.js'
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import { GlowWalletAdapter } from '@solana/wallet-adapter-glow'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
@@ -648,6 +648,7 @@ export default {
         }
         //console.log(operationSpec)
         var tx = new Transaction()
+        tx.add(ComputeBudgetProgram.setComputeUnitLimit({units: 400000}))
         if (orderSpec['orderType'] === 'bid') {
             if (orderSpec['matchType'] === 'limit') {
                 tx.add(this.program['aqua-dex'].instruction.limitBid(
@@ -707,7 +708,9 @@ export default {
         }
         console.log('Sending transaction')
         this.provider.opts['skipPreflight'] = true
-        return await this.provider.sendAndConfirm(tx)
+        return await this.provider.registerAndSend(tx, async (sig) => {
+            return await this.registerFn(bs58.encode(sig))
+        })
     },
     async cancelOrder(marketAccounts, orderSpec) {
         var accounts = {

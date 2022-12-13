@@ -98,10 +98,10 @@ import { DateTime } from 'luxon'
 import axios from 'axios'
 
 export default {
-    props: ['market'],
+    props: ['market', 'events'],
     //components: {},
     setup(props, context) {
-        const { market } = toRefs(props)
+        const { market, events } = toRefs(props)
 
         const totalPages = ref(1)
         const currentPage = ref(1)
@@ -164,6 +164,13 @@ export default {
             }
         })
         watch([currentPage], async (current, prev) => {
+            if (market.value.marketReady) {
+                var mkt = market.value.marketAddr
+                var user = market.value.userWallet
+                tradeList.value = await loadTradeHistory(mkt, user, current[0])
+            }
+        })
+        events.value.once('refresh_trade_history', async () => {
             if (market.value.marketReady) {
                 var mkt = market.value.marketAddr
                 var user = market.value.userWallet
