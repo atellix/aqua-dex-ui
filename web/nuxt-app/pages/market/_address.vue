@@ -26,7 +26,7 @@
             <v-col cols="12" md="4">
                 <v-row no-gutter>
                     <v-col cols="12">
-                        <token-balances :market="marketSummary" @settleTokens="settlementWithdraw"></token-balances>
+                        <token-balances :market="marketSummary" :events="eventQueue" @settleTokens="settlementWithdraw" @createTokenAccount="createTokenAccount"></token-balances>
                     </v-col>
                 </v-row>
                 <v-row no-gutter>
@@ -229,6 +229,10 @@ export default {
                                 'marketAddr': marketAddr,
                                 'marketData': marketData,
                                 'userWallet': walletPK,
+                                'mktTokenLabel': 'Solana ◎',
+                                'prcTokenLabel': 'USD Coin (dev)',
+                                'mktTokenSymbol': 'SOL',
+                                'prcTokenSymbol': 'USDC',
                                 'mktTokenDecimals': new Number(marketData.mktDecimals),
                                 'prcTokenDecimals': new Number(marketData.prcDecimals),
                                 'mktTokenScale': 10 ** new Number(marketData.mktDecimals),
@@ -333,6 +337,39 @@ export default {
                 console.log(error);
             }
         }
+        const createTokenAccount = async (tokenType) => {
+            var mint
+            if (tokenType === 'market') {
+                mint = marketSummary.value.marketData.mktMint
+            } else {
+                mint = marketSummary.value.marketData.prcMint
+            }
+            try {
+                alertTimeout.value = -1;
+                alertText.value = 'Preparing to create token account';
+                showAlert.value = true;
+                const txid = await $solana.createTokenAccount(mint, marketSummary.value.userWallet);
+                alertText.value = 'Processing create token account...';
+                marketSummary.value.marketReady = false
+                const result = await confirmTransaction(txid, 120);
+                marketSummary.value.marketReady = true
+                if (result && !result.meta.err) {
+                    alertText.value = 'Token account created successfully';
+                } else if (result) {
+                    alertText.value = 'Create token account failed';
+                } else {
+                    alertText.value = 'Create token account timeout';
+                }
+                alertTimeout.value = 5000;
+                await timeout(3000);
+                eventQueue.value.emit('refresh_token_list');
+            } catch (error) {
+                alertText.value = 'Create token account cancelled';
+                alertTimeout.value = 2000;
+                console.log('Solana Transaction Failed:');
+                console.log(error);
+            }
+        }
 
         return {
             eventQueue,
@@ -343,6 +380,7 @@ export default {
             sendOrder,
             cancelOrder,
             settlementWithdraw,
+            createTokenAccount,
             marketSummary,
             orderbookData,
         };

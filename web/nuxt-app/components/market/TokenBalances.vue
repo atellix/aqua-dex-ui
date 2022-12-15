@@ -5,18 +5,17 @@
         </v-card-title>
         <v-card-text>
             <v-list class="pb-0">
-                <v-list-item v-for="(data,index) in tokenList" :key="data.name" :class="`d-flex align-center px-0 ${index > 0 ? 'mt-4':''}`">
+                <v-list-item v-for="(data, index) in tokenList" :key="index" :class="`d-flex align-center px-0 ${index > 0 ? 'mt-4':''}`">
                     <v-avatar :color="data.color" size="40" :class="`${data.color} white--text font-weight-medium me-3`">
                         <span class="text-base">{{ data.abbr }}</span>
                     </v-avatar>
                     <div class="d-flex align-center flex-grow-1 flex-wrap">
                         <div class="me-2">
-                            <div class="font-weight-semibold">
+                            <div v-if="data.create">
+                                <v-btn @click="createTokenAccount(index)" text color="primary">Create Token Account</v-btn>
+                            </div>
+                            <div v-else class="font-weight-semibold">
                                 <span class="text--primary text-base me-1">{{ data.amount }}</span>
-                                <!--<v-icon size="20" :color="data.change.charAt(0) === '+' ? 'success':'error'">
-                                    {{ data.change.charAt(0) === '+' ? icons.mdiChevronUp: icons.mdiChevronDown }}
-                                </v-icon>
-                                <span :class="`text-xs ${data.change.charAt(0) === '+' ? 'success--text':'error--text'}`">{{ data.change.slice(1) }}</span>-->
                             </div>
                             <v-list-item-subtitle class="text-xs">
                                 {{ data.name }}
@@ -91,9 +90,9 @@ import { PublicKey } from '@solana/web3.js'
 import $solana from '@/atellix/solana-client'
 
 export default {
-    props: ['data', 'market'],
+    props: ['data', 'market', 'events'],
     setup(props, context) {
-        const { market } = toRefs(props)
+        const { market, events } = toRefs(props)
         const settleFunds = ref({
             'unsettled': false,
             'mktTokens': '',
@@ -105,30 +104,39 @@ export default {
             {
                 abbr: ' ',
                 amount: ' ',
-                name: 'Solana ◎',
-                symbol: 'SOL',
+                name: ' ',
+                symbol: ' ',
                 color: 'info',
-                //change: '+25.8%',
+                create: false,
             },
             {
                 abbr: ' ',
                 amount: ' ',
-                name: 'USD Coin',
-                symbol: 'USDC',
+                name: ' ',
+                symbol: ' ',
                 color: 'success',
-                //change: '-6.2%',
+                create: false,
             },
         ])
 
         const updateBalance = async (mint, wallet, scale, decimals, idx) => {
+            var tkl = tokenList.value
             var tokens = await $solana.getTokenBalance(mint, wallet)
+            if (tokens === '0') {
+                var hasAccount = await $solana.hasTokenAccount(mint, wallet)
+                //console.log('Has Account: ' + mint + ': ' + hasAccount)
+                if (!hasAccount) {
+                    tkl[idx]['create'] = true
+                } else {
+                    tkl[idx]['create'] = false
+                }
+            }
             //console.log(mint.toString() + ' ' + tokens + ' ' + scale + ' ' + decimals)
             var bal = new Number(tokens / scale)
             bal = bal.toLocaleString(undefined, {
                 'minimumFractionDigits': decimals,
                 'maximumFractionDigits': decimals,
             })
-            var tkl = tokenList.value
             tkl[idx]['amount'] = bal
             return true
         }
@@ -173,43 +181,57 @@ export default {
             return logAccounts
         }
 
+        const updateTokenInfo = async (marketSpec) => {
+            var marketData = marketSpec.marketData
+            var walletPK = marketSpec.userWallet
+            var mktScale = marketSpec.mktTokenScale
+            var mktDecimals = marketSpec.mktTokenDecimals
+            var prcScale = marketSpec.prcTokenScale
+            var prcDecimals = marketSpec.prcTokenDecimals
+            tokenList.value[0].name = marketSpec.mktTokenLabel
+            tokenList.value[1].name = marketSpec.prcTokenLabel
+            tokenList.value[0].symbol = marketSpec.mktTokenSymbol
+            tokenList.value[1].symbol = marketSpec.prcTokenSymbol
+            var results = await Promise.all([
+                updateBalance(marketData.mktMint, walletPK, mktScale, mktDecimals, 0),
+                updateBalance(marketData.prcMint, walletPK, prcScale, prcDecimals, 1),
+                settlementEntries(marketData.settle0),
+            ])
+            if (!tokenUpdates) {
+                tokenUpdates = true
+                const userToken1 = await $solana.associatedTokenAddress(walletPK, marketData.mktMint)
+                const userToken2 = await $solana.associatedTokenAddress(walletPK, marketData.prcMint)
+                $solana.provider.connection.onAccountChange(new PublicKey(userToken1.pubkey), async (accountInfo, context) => {
+                    await updateBalance(marketData.mktMint, walletPK, mktScale, mktDecimals, 0)
+                }); 
+                $solana.provider.connection.onAccountChange(new PublicKey(userToken2.pubkey), async (accountInfo, context) => {
+                    await updateBalance(marketData.prcMint, walletPK, prcScale, prcDecimals, 1)
+                }); 
+            }
+            var logAccounts = results[2]
+            for (var i = 0; i < logAccounts.length; i++) {
+                var k = logAccounts[i].toString()
+                if (!logUpdates[k]) {
+                    logUpdates[k] = true
+                    $solana.provider.connection.onAccountChange(logAccounts[i], async (accountInfo, context) => {
+                        console.log('Updated Settlement Log')
+                        await settlementEntries(marketData.settle0)
+                    })
+                }
+            }
+        }
+
+        events.value.once('refresh_token_list', async () => {
+            console.log('Refresh Token List')
+            await updateTokenInfo(market.value)
+            console.log('Refresh Token List Done')
+        })
+
         var tokenUpdates = false
         var logUpdates = {}
         watch([market], async (current, prev) => {
             if (current[0].marketReady) {
-                var marketData = current[0].marketData
-                var walletPK = current[0].userWallet
-                var mktScale = current[0].mktTokenScale
-                var mktDecimals = current[0].mktTokenDecimals
-                var prcScale = current[0].prcTokenScale
-                var prcDecimals = current[0].prcTokenDecimals
-                var results = await Promise.all([
-                    updateBalance(marketData.mktMint, walletPK, mktScale, mktDecimals, 0),
-                    updateBalance(marketData.prcMint, walletPK, prcScale, prcDecimals, 1),
-                    settlementEntries(marketData.settle0),
-                ])
-                if (!tokenUpdates) {
-                    tokenUpdates = true
-                    const userToken1 = await $solana.associatedTokenAddress(walletPK, marketData.mktMint)
-                    const userToken2 = await $solana.associatedTokenAddress(walletPK, marketData.prcMint)
-                    $solana.provider.connection.onAccountChange(new PublicKey(userToken1.pubkey), async (accountInfo, context) => {
-                        await updateBalance(marketData.mktMint, walletPK, mktScale, mktDecimals, 0)
-                    }); 
-                    $solana.provider.connection.onAccountChange(new PublicKey(userToken2.pubkey), async (accountInfo, context) => {
-                        await updateBalance(marketData.prcMint, walletPK, prcScale, prcDecimals, 1)
-                    }); 
-                }
-                var logAccounts = results[2]
-                for (var i = 0; i < logAccounts.length; i++) {
-                    var k = logAccounts[i].toString()
-                    if (!logUpdates[k]) {
-                        logUpdates[k] = true
-                        $solana.provider.connection.onAccountChange(logAccounts[i], async (accountInfo, context) => {
-                            console.log('Updated Settlement Log')
-                            await settlementEntries(marketData.settle0)
-                        })
-                    }
-                }
+                await updateTokenInfo(current[0])
             }
         })
 
@@ -259,10 +281,19 @@ export default {
             context.emit('settleTokens', {'logEntries': settleList.value})
         }
 
+        const createTokenAccount = (tokenSelect) => {
+            if (tokenSelect === 1) {
+                context.emit('createTokenAccount', 'pricing')
+            } else {
+                context.emit('createTokenAccount', 'market')
+            }
+        }
+
         return {
             tokenList,
             settleFunds,
             settleTokens,
+            createTokenAccount,
             icons: {
                 mdiDotsVertical,
                 mdiChevronUp,

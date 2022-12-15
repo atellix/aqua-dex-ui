@@ -131,11 +131,11 @@ export default {
         //let walletPK = new PublicKey(wallet)
         //console.log('walletPK')
         //console.log(walletPK.toBase58())
-        let tokenInfo = await this.associatedTokenAddress(walletPK, mintPK)
-        let tokenPK = new PublicKey(tokenInfo.pubkey)
-        let amount = '0'
+        const tokenInfo = await this.associatedTokenAddress(walletPK, mintPK)
+        const tokenPK = new PublicKey(tokenInfo.pubkey)
+        var amount = '0'
         try {
-            let tokenAccount = await getAccount(this.provider.connection, tokenPK)
+            const tokenAccount = await getAccount(this.provider.connection, tokenPK)
             //console.log('Token Account - Wallet: ' + wallet + ' Mint: ' + mint)
             //console.log(tokenAccount)
             amount = tokenAccount.amount.toString()
@@ -148,9 +148,11 @@ export default {
         }
         return amount
     },
-    async hasTokenAccount(ataPK) {
+    async hasTokenAccount(mintPK, walletPK) {
+        let tokenInfo = await this.associatedTokenAddress(walletPK, mintPK)
+        let tokenPK = new PublicKey(tokenInfo.pubkey)
         try {
-            await getAccount(this.provider.connection, ataPK)
+            await getAccount(this.provider.connection, tokenPK)
         } catch (error) {
             return false
         }
@@ -815,5 +817,16 @@ export default {
             return null
         }
         return null
-    }
+    },
+    async createTokenAccount(mint, wallet) {
+        const tokenInfo = await this.associatedTokenAddress(wallet, mint)
+        const tokenPK = new PublicKey(tokenInfo.pubkey)
+        const tx = new Transaction()
+        tx.add(createAssociatedTokenAccountInstruction(wallet, tokenPK, wallet, mint))
+        console.log('Sending transaction')
+        this.provider.opts['skipPreflight'] = true
+        return await this.provider.registerAndSend(tx, async (sig) => {
+            return await this.registerFn(bs58.encode(sig))
+        })
+    },
 }

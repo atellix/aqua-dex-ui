@@ -97,6 +97,9 @@ import { ref, toRefs, watch } from '@vue/composition-api'
 import { DateTime } from 'luxon'
 import axios from 'axios'
 
+const production = false
+const baseURL = 'https://aqua-dev1.atellix.net:8000/v1/'
+
 export default {
     props: ['market', 'events'],
     //components: {},
@@ -108,7 +111,7 @@ export default {
         const showHistory = ref(false)
         const tradeList = ref([])
         const loadLastTx = async (market, user) => {
-            var url = 'https://aqua-dev1.atellix.net:8000/v1/last_tx'
+            var url = baseURL + 'last_tx'
             var res = await axios.post(url, JSON.stringify({
                 'market': market,
                 'user': user,
@@ -119,14 +122,13 @@ export default {
             return ''
         }
         const loadTradeHistory = async (market, user, page) => {
-            var url = 'https://aqua-dev1.atellix.net:8000/v1/trades'
+            var url = baseURL + 'trades'
             var res = await axios.post(url, JSON.stringify({
                 'market': market,
                 'user': user,
                 'page': page,
             }), { 'Content-Type': 'application/json' })
             var result = []
-            var devnet = true
             var limit = 10
             if (res.status === 200 && res.data.result === 'ok') {
                 totalPages.value = Math.floor(res.data.count / limit)
@@ -138,7 +140,7 @@ export default {
                     var lastDt = DateTime.fromISO(item.ts)
                     item.ts = lastDt.toLocaleString(DateTime.DATETIME_SHORT)
                     item.link = 'https://explorer.solana.com/tx/' + item.sig
-                    if (devnet) {
+                    if (!production) {
                         item.link = item.link + '?cluster=devnet'
                     }
                     result.push(item)
