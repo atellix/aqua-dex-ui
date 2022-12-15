@@ -33,7 +33,7 @@
                     </thead>
                     <tbody>
                         <tr v-if="tradeList.length == 0" class="orderbook-row">
-                            <td class="text-center" colspan="3"><em>(None)</em></td>
+                            <td class="text-center" colspan="7"><em>(None)</em></td>
                         </tr>
                         <tr v-for="trade in tradeList" :key="trade.data.tradeId" class="orderbook-row">
                             <td>

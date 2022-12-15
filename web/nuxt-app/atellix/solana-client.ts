@@ -744,7 +744,9 @@ export default {
         ))
         console.log('Sending transaction')
         this.provider.opts['skipPreflight'] = true
-        return await this.provider.sendAndConfirm(tx)
+        return await this.provider.registerAndSend(tx, async (sig) => {
+            return await this.registerFn(bs58.encode(sig))
+        })
     },
     async withdrawTokens(marketAccounts, withdrawSpec) {
         var entries = withdrawSpec.logEntries
@@ -789,7 +791,9 @@ export default {
         }
         console.log('Sending transaction')
         this.provider.opts['skipPreflight'] = true
-        return await this.provider.sendAndConfirm(tx)
+        return await this.provider.registerAndSend(tx, async (sig) => {
+            return await this.registerFn(bs58.encode(sig))
+        })
     },
     async getUserVault(market, user) {
         const aquadex = this.loadProgram('aqua-dex')

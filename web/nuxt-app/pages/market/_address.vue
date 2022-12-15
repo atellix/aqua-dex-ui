@@ -31,7 +31,7 @@
                 </v-row>
                 <v-row no-gutter>
                     <v-col cols="12">
-                        <order-entry :market="marketSummary" @sendOrder="sendOrder"></order-entry>
+                        <order-entry :market="marketSummary" :events="eventQueue" @sendOrder="sendOrder"></order-entry>
                     </v-col>
                 </v-row>
                 <v-row no-gutter>
@@ -257,25 +257,18 @@ export default {
                 var now = new Date();
                 diff = wait - (Math.abs(start.getTime() - now.getTime()) / 1000);
                 var sleep = Math.min(diff, 5);
-                console.log('Sleep: ' + sleep);
                 await timeout(sleep * 1000);
             } while (diff > 0)
             return null;
         }
         const sendOrder = async (orderSpec) => {
             try {
-                console.log('Send Order:');
-                console.log(orderSpec);
                 alertTimeout.value = -1;
                 alertText.value = 'Preparing to send order';
                 showAlert.value = true;
                 const txid = await $solana.sendOrder(marketAccounts.value, orderSpec);
-                console.log('Transaction');
-                console.log(txid)
                 alertText.value = 'Processing order...';
-                const result = await confirmTransaction(txid, 60);
-                console.log('Result');
-                console.log(result);
+                const result = await confirmTransaction(txid, 120);
                 if (result && !result.meta.err) {
                     alertText.value = 'Order processed successfully';
                 } else if (result) {
@@ -284,31 +277,60 @@ export default {
                     alertText.value = 'Order timeout';
                 }
                 alertTimeout.value = 5000;
-                await timeout(3000);
-                eventQueue.value.emit('refresh_trade_history')
+                eventQueue.value.emit('clear_order_entry');
+                await timeout(10000);
+                eventQueue.value.emit('refresh_trade_history');
             } catch (error) {
+                alertText.value = 'Order cancelled';
+                alertTimeout.value = 2000;
                 console.log('Solana Transaction Failed:');
                 console.log(error);
             }
         }
         const cancelOrder = async (cancelSpec) => {
             try {
-                console.log('Cancel Order:');
-                console.log(cancelSpec);
-                console.log(await $solana.cancelOrder(marketAccounts.value, cancelSpec));
+                alertTimeout.value = -1;
+                alertText.value = 'Preparing to cancel order';
+                showAlert.value = true;
+                const txid = await $solana.cancelOrder(marketAccounts.value, cancelSpec);
+                alertText.value = 'Processing cancel order...';
+                const result = await confirmTransaction(txid, 120);
+                if (result && !result.meta.err) {
+                    alertText.value = 'Cancel order processed successfully';
+                } else if (result) {
+                    alertText.value = 'Cancel order failed';
+                } else {
+                    alertText.value = 'Cancel order timeout';
+                }
+                alertTimeout.value = 5000;
             } catch (error) {
+                alertText.value = 'Cancel order cancelled';
+                alertTimeout.value = 2000;
                 console.log('Solana Transaction Failed:');
-                console.log(error)
+                console.log(error);
             }
         }
         const settlementWithdraw = async (withdrawSpec) => {
             try {
-                console.log('Withdraw Tokens:');
-                console.log(withdrawSpec);
-                console.log(await $solana.withdrawTokens(marketAccounts.value, withdrawSpec));
+                alertTimeout.value = -1;
+                alertText.value = 'Preparing to withdraw';
+                showAlert.value = true;
+                const txid = await $solana.withdrawTokens(marketAccounts.value, withdrawSpec);
+                alertText.value = 'Processing withdrawal...';
+                const result = await confirmTransaction(txid, 120);
+                if (result && !result.meta.err) {
+                    alertText.value = 'Withdrawal processed successfully';
+                } else if (result) {
+                    alertText.value = 'Withdrawal failed';
+                } else {
+                    alertText.value = 'Withdrawal timeout';
+                }
+                alertTimeout.value = 5000;
             } catch (error) {
+                alertText.value = 'Withdrawal cancelled';
+                alertTimeout.value = 2000;
                 console.log('Solana Transaction Failed:');
-                console.log(error)
+                console.log(error);
             }
         }
 
@@ -325,9 +347,5 @@ export default {
             orderbookData,
         };
     },
-    /*async asyncData({ params, redirect }) {
-        console.log('Market Address');
-        console.log(params.address);
-    },*/
 };
 </script>

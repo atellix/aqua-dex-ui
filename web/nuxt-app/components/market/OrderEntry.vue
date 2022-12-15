@@ -10,7 +10,6 @@
                 <v-tab-item v-for="item in items" :key="item" class="mt-2">
                     <template v-if="item == 'Bid'">
                         <v-card-text>
-                            Bid on market tokens for purchase: MKT
                             <form>
                                 <v-radio-group v-model="matchType" row class="mt-0 mb-3" hide-details>
                                     <v-radio value="limit" label="Limit Bid"></v-radio>
@@ -39,7 +38,6 @@
                     </template>
                     <template v-else-if="item == 'Offer'">
                         <v-card-text>
-                            Offer market tokens for sale: MKT
                             <form>
                                 <v-radio-group v-model="matchType" row class="mt-0 mb-3" hide-details>
                                     <v-radio value="limit" label="Limit Offer"></v-radio>
@@ -76,7 +74,7 @@ import { watch, toRefs, ref } from '@vue/composition-api'
 import { mdiDotsVertical, mdiChevronUp, mdiChevronDown } from '@mdi/js'
 
 export default {
-    props: ['market'],
+    props: ['market', 'events'],
     setup(props, context) {
         const tab = ref(0)
         const matchType = ref('limit')
@@ -101,6 +99,17 @@ export default {
         const marketAskQty = ref('')
         const limitAskPrice = ref('')
         const limitAskQty = ref('')
+
+        props.events.once('clear_order_entry', () => {
+            marketBidPrice.value = ''
+            marketBidQty.value = ''
+            limitBidPrice.value = ''
+            limitBidQty.value = ''
+            marketAskPrice.value = ''
+            marketAskQty.value = ''
+            limitAskPrice.value = ''
+            limitAskQty.value = ''
+        })
         const sendOrder = () => {
             var orderSpec = {}
             if (tab.value === 0) {

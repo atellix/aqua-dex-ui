@@ -23,10 +23,13 @@
                             <v-icon>{{ icons.mdiShareVariantOutline }}</v-icon>
                         </v-btn>
                     </v-card-actions>
+                    <v-card-text v-if="!$store.state.device.isDesktop" style="margin-left: -12px;">
+                        <a :href="phantomLink(marketInfo.address)">
+                            <v-img height="38" width="169" :src="require('@/assets/images/atellix/phantom-open-1.png')"></v-img>
+                        </a>
+                    </v-card-text>
                     <v-card-text>
                         {{ marketInfo.description }}
-                        <template v-if="marketInfo.coingecko">
-                        </template>
                     </v-card-text>
                     <v-card-text v-if="marketInfo.link" class="text--primary text-base">
                         <a :href="'https://' + marketInfo.link" target="_blank">{{ marketInfo.link }}</a>
@@ -51,5 +54,10 @@ export default {
             icons: { mdiShareVariantOutline },
         }
     },
+    methods: {
+        phantomLink (marketAddress) {
+            return 'https://phantom.app/ul/browse/' + encodeURIComponent('https://' + document.location.host + '/market/' + marketAddress) + '?ref=' + encodeURIComponent('https://' + document.location.hostname)
+        }
+    }
 }
 </script>
