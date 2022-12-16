@@ -14,7 +14,7 @@
                 </v-row>
                 <v-row no-gutter>
                     <v-col cols="12">
-                        <orderbook-view :data="orderbookData" :market="marketSummary"></orderbook-view>
+                        <orderbook-view :market="marketSummary" :events="eventQueue"></orderbook-view>
                     </v-col>
                 </v-row>
                 <v-row no-gutter>
@@ -36,7 +36,7 @@
                 </v-row>
                 <v-row no-gutter>
                     <v-col cols="12">
-                        <active-orders :market="marketSummary" :orders="orderbookData" @cancelOrder="cancelOrder"></active-orders>
+                        <active-orders :market="marketSummary" :events="eventQueue" @cancelOrder="cancelOrder"></active-orders>
                     </v-col>
                 </v-row>
                 <v-row no-gutter>
@@ -67,6 +67,7 @@ import { ref, onMounted } from '@vue/composition-api';
 import { PublicKey } from '@solana/web3.js';
 import $solana from '@/atellix/solana-client';
 import Emitter from 'tiny-emitter';
+import axios from 'axios';
 import bs58 from 'bs58';
 
 import MarketSummary from "@/components/market/MarketSummary.vue";
@@ -78,8 +79,7 @@ import OrderEntry from "@/components/market/OrderEntry.vue";
 import TradeLog from "@/components/market/TradeLog.vue";
 import TradeHistory from "@/components/market/TradeHistory.vue";
 
-// demos
-import DashboardCongratulationJohn from "@/components/dashboard/DashboardCongratulationJohn.vue";
+const baseURL = 'https://aqua-dev1.atellix.net:8000/v1/'
 
 export default {
     components: {
@@ -91,7 +91,6 @@ export default {
         ChartView,
         TradeLog,
         TradeHistory,
-        DashboardCongratulationJohn,
     },
     layout: "Content",
     head() {
@@ -137,6 +136,18 @@ export default {
         const alertText = ref('');
         const alertTimeout = ref(-1);
         const route = context.root.$route;
+
+        const getMarketMetadata = async (market) => {
+            const url = baseURL + 'market_info';
+            const res = await axios.post(url, JSON.stringify({
+                'market': market,
+            }), { 'Content-Type': 'application/json' });
+            if (res.status === 200) {
+                return res.data;
+            } else {
+                return {};
+            }
+        };
 
         onMounted(async () => {
             $solana.init();
@@ -194,20 +205,13 @@ export default {
                             //console.log(marketData);
                             var marketStateData = await $solana.getAccountData('aqua-dex', 'marketState', marketData.state);
                             //console.log(marketStateData);
-                            var orderBook = await $solana.getAccountInfo(marketData.orders);
-                            var bookData = $solana.decodeOrderBook(orderBook.data, 10);
-                            orderbookData.value = bookData;
-                            $solana.provider.connection.onAccountChange(marketData.orders, (accountInfo, context) => {
-                                orderbookData.value = $solana.decodeOrderBook(accountInfo.data);
-                                console.log('Orderbook updated');
-                            });
-                            console.log('Orderbook loaded');
                             const marketAgent = await $solana.programAddress([marketPK.toBuffer()], $solana.program['aqua-dex'].programId)
                             const marketAgentPK = new PublicKey(marketAgent.pubkey)
                             const tokenVault1 = await $solana.associatedTokenAddress(marketAgentPK, marketData.mktMint)
                             const tokenVault2 = await $solana.associatedTokenAddress(marketAgentPK, marketData.prcMint)
                             const userToken1 = await $solana.associatedTokenAddress(walletPK, marketData.mktMint)
                             const userToken2 = await $solana.associatedTokenAddress(walletPK, marketData.prcMint)
+                            const marketMeta = await getMarketMetadata(marketAddr)
                             marketAccounts.value = {
                                 'market': marketPK,
                                 'state': marketData.state,
@@ -225,14 +229,15 @@ export default {
                             marketSummary.value = {
                                 'marketLoading': false,
                                 'marketReady': true,
-                                'marketTitle': 'SOL/USDC',
+                                'marketTitle': marketMeta.name || 'SPL Token Swap Market',
                                 'marketAddr': marketAddr,
                                 'marketData': marketData,
+                                'marketMeta': marketMeta,
                                 'userWallet': walletPK,
-                                'mktTokenLabel': 'Solana ◎',
-                                'prcTokenLabel': 'USD Coin (dev)',
-                                'mktTokenSymbol': 'SOL',
-                                'prcTokenSymbol': 'USDC',
+                                'mktTokenLabel': marketMeta.metadata.marketToken.name || 'Market Token',
+                                'prcTokenLabel': marketMeta.metadata.pricingToken.name || 'Pricing Token',
+                                'mktTokenSymbol': marketMeta.metadata.marketToken.symbol || '',
+                                'prcTokenSymbol': marketMeta.metadata.pricingToken.symbol || '',
                                 'mktTokenDecimals': new Number(marketData.mktDecimals),
                                 'prcTokenDecimals': new Number(marketData.prcDecimals),
                                 'mktTokenScale': 10 ** new Number(marketData.mktDecimals),
@@ -373,6 +378,7 @@ export default {
 
         return {
             eventQueue,
+            marketSummary,
             showAlert,
             alertText,
             alertTimeout,
@@ -381,8 +387,6 @@ export default {
             cancelOrder,
             settlementWithdraw,
             createTokenAccount,
-            marketSummary,
-            orderbookData,
         };
     },
 };

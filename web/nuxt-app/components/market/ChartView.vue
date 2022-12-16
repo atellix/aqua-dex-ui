@@ -16,6 +16,8 @@ import { mdiDotsVertical, mdiTrendingUp, mdiCurrencyUsd } from '@mdi/js'
 import { ref, toRefs, watch, onMounted, getCurrentInstance } from '@vue/composition-api'
 import axios from 'axios'
 
+const baseURL = 'https://aqua-dev1.atellix.net:8000/v1/'
+
 export default {
     props: ['market'],
     components: {
@@ -84,7 +86,7 @@ export default {
         }
         const loadData = async (vr, cd, sc, m, v) => {
             console.log('Loading chart data: ' + m + ' ' + v)
-            var url = 'https://aqua-dev1.atellix.net:8000/v1/history' // TODO: Make this a config var
+            var url = baseURL + 'history'
             var res = await axios.post(url, JSON.stringify({
                 'market': m,
                 'view': v,
@@ -106,16 +108,18 @@ export default {
                 }
                 list.reverse()
                 cd.value[0].data = list
-                try {
-                    vr.apexChart.updateOptions({
-                        xaxis: {
-                            range: chartViewRange[v],
-                        }
-                    })
-                    vr.apexChart.updateSeries(cd.value)
-                } catch (error) {
-                    console.log('ApexCharts Error')
-                    console.log(error)
+                if (typeof vr.apexChart !== 'undefined') {
+                    try {
+                        vr.apexChart.updateOptions({
+                            xaxis: {
+                                range: chartViewRange[v],
+                            }
+                        })
+                        vr.apexChart.updateSeries(cd.value)
+                    } catch (error) {
+                        console.log('ApexCharts Error')
+                        console.log(error)
+                    }
                 }
             }
         }

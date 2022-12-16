@@ -172,11 +172,11 @@ export default {
                 tradeList.value = await loadTradeHistory(mkt, user, current[0])
             }
         })
-        events.value.once('refresh_trade_history', async () => {
+        events.value.on('refresh_trade_history', async () => {
             if (market.value.marketReady) {
                 var mkt = market.value.marketAddr
                 var user = market.value.userWallet
-                tradeList.value = await loadTradeHistory(mkt, user, current[0])
+                tradeList.value = await loadTradeHistory(mkt, user, currentPage.value)
             }
         })
 

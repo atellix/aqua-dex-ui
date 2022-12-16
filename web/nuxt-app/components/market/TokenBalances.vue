@@ -6,9 +6,16 @@
         <v-card-text>
             <v-list class="pb-0">
                 <v-list-item v-for="(data, index) in tokenList" :key="index" :class="`d-flex align-center px-0 ${index > 0 ? 'mt-4':''}`">
-                    <v-avatar :color="data.color" size="40" :class="`${data.color} white--text font-weight-medium me-3`">
-                        <span class="text-base">{{ data.abbr }}</span>
-                    </v-avatar>
+                    <template v-if="data.image">
+                        <v-avatar size="40" class="me-3">
+                            <img :src="data.image" :alt="data.symbol"/>
+                        </v-avatar>
+                    </template>
+                    <template v-else>
+                        <v-avatar :color="data.color" size="40" :class="`${data.color} white--text font-weight-medium me-3`">
+                            <span class="text-base">{{ data.abbr }}</span>
+                        </v-avatar>
+                    </template>
                     <div class="d-flex align-center flex-grow-1 flex-wrap">
                         <div class="me-2">
                             <div v-if="data.create">
@@ -35,9 +42,16 @@
                     <v-list class="pb-0 mb-0">
                         <template v-if="settleFunds.mktTokens">
                             <v-list-item class="d-flex align-center px-0">
-                                <v-avatar color="info" size="25" class="info white--text font-weight-medium me-3">
-                                    <span class="text-base"> </span>
-                                </v-avatar>
+                                <template v-if="tokenList[0].image">
+                                    <v-avatar size="25" class="me-3">
+                                        <img :src="tokenList[0].image" :alt="tokenList[0].symbol"/>
+                                    </v-avatar>
+                                </template>
+                                <template v-else>
+                                    <v-avatar color="info" size="25" class="info white--text font-weight-medium me-3">
+                                        <span class="text-base"> </span>
+                                    </v-avatar>
+                                </template>
                                 <div class="d-flex align-center flex-grow-1 flex-wrap">
                                     <div class="me-2">
                                         <div class="font-weight-semibold">
@@ -56,9 +70,16 @@
                         </template>
                         <template v-if="settleFunds.prcTokens">
                             <v-list-item class="d-flex align-center px-0">
-                                <v-avatar color="success" size="25" class="success white--text font-weight-medium me-3">
-                                    <span class="text-base"> </span>
-                                </v-avatar>
+                                <template v-if="tokenList[1].image">
+                                    <v-avatar size="25" class="me-3">
+                                        <img :src="tokenList[1].image" :alt="tokenList[1].symbol"/>
+                                    </v-avatar>
+                                </template>
+                                <template v-else>
+                                    <v-avatar color="success" size="25" class="success white--text font-weight-medium me-3">
+                                        <span class="text-base"> </span>
+                                    </v-avatar>
+                                </template>
                                 <div class="d-flex align-center flex-grow-1 flex-wrap">
                                     <div class="me-2">
                                         <div class="font-weight-semibold">
@@ -192,6 +213,12 @@ export default {
             tokenList.value[1].name = marketSpec.prcTokenLabel
             tokenList.value[0].symbol = marketSpec.mktTokenSymbol
             tokenList.value[1].symbol = marketSpec.prcTokenSymbol
+            if (marketSpec.marketMeta.metadata.marketToken.image) {
+                tokenList.value[0].image = marketSpec.marketMeta.metadata.marketToken.image
+            }
+            if (marketSpec.marketMeta.metadata.pricingToken.image) {
+                tokenList.value[1].image = marketSpec.marketMeta.metadata.pricingToken.image
+            }
             var results = await Promise.all([
                 updateBalance(marketData.mktMint, walletPK, mktScale, mktDecimals, 0),
                 updateBalance(marketData.prcMint, walletPK, prcScale, prcDecimals, 1),
@@ -221,10 +248,9 @@ export default {
             }
         }
 
-        events.value.once('refresh_token_list', async () => {
-            console.log('Refresh Token List')
+        events.value.on('refresh_token_list', async () => {
             await updateTokenInfo(market.value)
-            console.log('Refresh Token List Done')
+            console.log('Refreshed Token List')
         })
 
         var tokenUpdates = false

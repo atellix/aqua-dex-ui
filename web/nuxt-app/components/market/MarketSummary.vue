@@ -66,7 +66,7 @@ export default {
 
         const resolveStatisticsIconVariation = data => {
             if (data === 'Last Price') return { icon: mdiCashCheck, color: 'primary' }
-            if (data === 'Last Trade') return { icon: mdiClockCheckOutline, color: 'success' }
+            if (data === 'Last Trade') return { icon: mdiClockCheckOutline, color: 'primary' }
             return { icon: mdiAccountOutline, color: 'success' }
         }
 

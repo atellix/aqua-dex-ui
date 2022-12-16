@@ -7,9 +7,16 @@
             <v-list class="pb-0" v-if="orderList.length > 0">
                 <div v-for="(data,index) in orderList" :key="data.key">
                     <v-list-item :class="`d-flex align-center px-0 ${index > 0 ? 'mt-4':''}`">
-                        <v-avatar :color="data.color" size="25" :class="`${data.color} white--text font-weight-medium me-3`">
-                            <span class="text-base">{{ data.abbr }}</span>
-                        </v-avatar>
+                        <template v-if="data.image">
+                            <v-avatar size="25" class="me-3">
+                                <img :src="data.image" :alt="data.symbol"/>
+                            </v-avatar>
+                        </template>
+                        <template v-else>
+                            <v-avatar :color="data.color" size="25" :class="`${data.color} white--text font-weight-medium me-3`">
+                                <span class="text-base">{{ data.abbr }}</span>
+                            </v-avatar>
+                        </template>
                         <div class="d-flex align-center flex-grow-1 flex-wrap">
                             <div class="me-2">
                                 <div class="font-weight-semibold">
@@ -49,78 +56,66 @@ import { watch, toRefs, ref } from '@vue/composition-api'
 import { mdiDotsVertical, mdiChevronUp, mdiChevronDown } from '@mdi/js'
 
 export default {
-    props: ['orders', 'market'],
+    props: ['market', 'events'],
     setup(props, context) {
-        const { orders, market } = toRefs(props)
+        const { market, events } = toRefs(props)
         const showCancel = ref('')
-        const orderList = ref([
-            /*{
-                abbr: ' ',
-                amount: 'X',
-                name: 'Solana ◎',
-                symbol: 'SOL',
-                color: 'info',
-                //change: '+25.8%',
-            },
-            {
-                abbr: ' ',
-                amount: 'Y',
-                name: 'USD Coin',
-                symbol: 'USDC',
-                color: 'success',
-                //change: '-6.2%',
-            },*/
-        ])
+        const orderList = ref([])
  
-        watch([orders, market], (current, prev) => {
-            if (current[1].marketReady) {
-                var user = current[1].userWallet.toString()
-                var orderMap = {}
-                var orderItems = []
-                var i
-                for (i = 0; i < current[0].bids.length; i++) {
-                    var order = current[0].bids[i]
-                    if (order.owner === user) {
-                        orderMap[order.key] = order
-                        orderItems.push(order.key)
-                    }
+        events.value.on('update_orderbook', (orderbookData) => {
+            //console.log('Orderbook update hook')
+            var user = market.value.userWallet.toString()
+            var orderMap = {}
+            var orderItems = []
+            var i
+            for (i = 0; i < orderbookData.bids.length; i++) {
+                var order = orderbookData.bids[i]
+                if (order.owner === user) {
+                    orderMap[order.key] = order
+                    orderItems.push(order.key)
                 }
-                for (i = 0; i < current[0].asks.length; i++) {
-                    var order = current[0].asks[i]
-                    if (order.owner === user) {
-                        orderMap[order.key] = order
-                        orderItems.push(order.key)
-                    }
-                }
-                var itemList = []
-                for (i = 0; i < orderItems.length; i++) {
-                    var k = orderItems[i]
-                    var order = orderMap[k]
-                    var quantity = (new Number(order.amount / current[1].mktTokenScale)).toFixed(2)
-                    var price = (new Number(order.price / current[1].prcTokenScale)).toFixed(4)
-                    var item = {
-                        'key': order.key,
-                        'abbr': ' ',
-                        'amount': quantity + ' @ ' + price,
-                    }
-                    if (order.type === 'bid') {
-                        var total = new Number(order.amount / current[1].mktTokenScale)
-                        total = total * new Number(order.price / current[1].prcTokenScale)
-                        item['name'] = 'Bid'
-                        item['side'] = 'bid'
-                        item['color'] = 'success'
-                        item['symbol'] = total.toFixed(2) + ' USDC'
-                    } else if (order.type === 'ask') {
-                        var total = new Number(order.amount / current[1].mktTokenScale)
-                        item['name'] = 'Offer'
-                        item['side'] = 'ask'
-                        item['color'] = 'info'
-                        item['symbol'] = total.toFixed(2) + ' SOL'
-                    }
-                    itemList.push(item)
-                }
-                orderList.value = itemList
             }
+            for (i = 0; i < orderbookData.asks.length; i++) {
+                var order = orderbookData.asks[i]
+                if (order.owner === user) {
+                    orderMap[order.key] = order
+                    orderItems.push(order.key)
+                }
+            }
+            var itemList = []
+            for (i = 0; i < orderItems.length; i++) {
+                var k = orderItems[i]
+                var order = orderMap[k]
+                var quantity = (new Number(order.amount / market.value.mktTokenScale)).toFixed(2)
+                var price = (new Number(order.price / market.value.prcTokenScale)).toFixed(4)
+                var item = {
+                    'key': order.key,
+                    'abbr': ' ',
+                    'amount': quantity + ' @ ' + price,
+                }
+                if (order.type === 'bid') {
+                    var total = new Number(order.amount / market.value.mktTokenScale)
+                    total = total * new Number(order.price / market.value.prcTokenScale)
+                    item['name'] = 'Bid'
+                    item['side'] = 'bid'
+                    item['color'] = 'success'
+                    item['symbol'] = total.toFixed(2) + ' ' + market.value.prcTokenSymbol
+                    if (market.value.marketMeta.metadata.pricingToken.image) {
+                        item['image'] = market.value.marketMeta.metadata.pricingToken.image
+                    }
+                } else if (order.type === 'ask') {
+                    var total = new Number(order.amount / market.value.mktTokenScale)
+                    item['name'] = 'Offer'
+                    item['side'] = 'ask'
+                    item['color'] = 'info'
+                    item['symbol'] = total.toFixed(2) + ' ' + market.value.mktTokenSymbol
+                    if (market.value.marketMeta.metadata.marketToken.image) {
+                        item['image'] = market.value.marketMeta.metadata.marketToken.image
+                    }
+                }
+                itemList.push(item)
+            }
+            orderList.value = itemList
         })
         const cancelOrder = (orderId, orderType) => {
             context.emit('cancelOrder', {'orderId': orderId, 'orderType': orderType})

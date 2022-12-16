@@ -100,7 +100,7 @@ export default {
         const limitAskPrice = ref('')
         const limitAskQty = ref('')
 
-        props.events.once('clear_order_entry', () => {
+        props.events.on('clear_order_entry', () => {
             marketBidPrice.value = ''
             marketBidQty.value = ''
             limitBidPrice.value = ''
