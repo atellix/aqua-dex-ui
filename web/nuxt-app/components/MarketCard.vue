@@ -8,7 +8,7 @@
                 </v-col>
                 <v-col cols="8" sm="12" md="8" lg="8">
                     <v-card-title>
-                        {{ marketInfo.title }}
+                        {{ marketInfo.name }}
                     </v-card-title>
                     <v-card-subtitle class="text-no-wrap">
                         {{ marketInfo.subtitle }}
