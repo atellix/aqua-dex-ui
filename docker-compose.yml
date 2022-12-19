@@ -5,7 +5,8 @@ services:
     build: ./nginx
     ports:
       - "9443:9443"
-    entrypoint: npm run dev
+    command: "/etc/nginx/run_nginx.sh"
+    env_file: .env
     networks:
       - net3
 

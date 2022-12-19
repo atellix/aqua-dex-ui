@@ -3,6 +3,9 @@ import path from 'path';
 import colors from "vuetify/es5/util/colors";
 
 export default {
+    generate: {
+        dir: '../../nginx/html'
+    },
     /*server: {
         https: {
             key: fs.readFileSync(path.resolve(__dirname, 'privkey.pem')),
