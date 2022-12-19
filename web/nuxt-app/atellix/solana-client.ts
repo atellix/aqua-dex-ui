@@ -329,7 +329,7 @@ export default {
         }
         return orderBook
     },
-    decodeOrderBook(data, limit) {
+    decodeOrderBook(data) {
         const stTypedPage = lo.struct([
             lo.nu64('header_size'),
             lo.nu64('offset_size'),
@@ -360,12 +360,6 @@ export default {
         bids.sort(function(a, b) {
             return b.key.localeCompare(a.key)
         })
-        if (asks.length > limit) {
-            asks = asks.slice(0, limit)
-        }
-        if (bids.length > limit) {
-            bids = bids.slice(0, limit)
-        }
         return {
             'bids': bids,
             'asks': asks,
@@ -708,10 +702,11 @@ export default {
                 ))
             }
         }
-        console.log('Sending transaction')
         this.provider.opts['skipPreflight'] = true
         return await this.provider.registerAndSend(tx, async (sig) => {
-            return await this.registerFn(bs58.encode(sig))
+            const sigtxt = bs58.encode(sig)
+            console.log('Sending transaction: ' + sigtxt)
+            return await this.registerFn(sigtxt)
         })
     },
     async cancelOrder(marketAccounts, orderSpec) {
@@ -744,10 +739,11 @@ export default {
             orderId,
             operationSpec
         ))
-        console.log('Sending transaction')
         this.provider.opts['skipPreflight'] = true
         return await this.provider.registerAndSend(tx, async (sig) => {
-            return await this.registerFn(bs58.encode(sig))
+            const sigtxt = bs58.encode(sig)
+            console.log('Sending transaction: ' + sigtxt)
+            return await this.registerFn(sigtxt)
         })
     },
     async withdrawTokens(marketAccounts, withdrawSpec) {
@@ -791,10 +787,11 @@ export default {
                 tx.add(this.program['aqua-dex'].instruction.withdraw(operationSpec))
             }
         }
-        console.log('Sending transaction')
         this.provider.opts['skipPreflight'] = true
         return await this.provider.registerAndSend(tx, async (sig) => {
-            return await this.registerFn(bs58.encode(sig))
+            const sigtxt = bs58.encode(sig)
+            console.log('Sending transaction: ' + sigtxt)
+            return await this.registerFn(sigtxt)
         })
     },
     async getUserVault(market, user) {
@@ -826,7 +823,9 @@ export default {
         console.log('Sending transaction')
         this.provider.opts['skipPreflight'] = true
         return await this.provider.registerAndSend(tx, async (sig) => {
-            return await this.registerFn(bs58.encode(sig))
+            const sigtxt = bs58.encode(sig)
+            console.log('Sending transaction: ' + sigtxt)
+            return await this.registerFn(sigtxt)
         })
     },
 }

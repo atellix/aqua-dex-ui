@@ -241,7 +241,7 @@ export default {
                 if (!logUpdates[k]) {
                     logUpdates[k] = true
                     $solana.provider.connection.onAccountChange(logAccounts[i], async (accountInfo, context) => {
-                        console.log('Updated Settlement Log')
+                        console.log('Updated settlement log')
                         await settlementEntries(marketData.settle0)
                     })
                 }

@@ -4,7 +4,7 @@
             <span>Trade History</span>
         </v-card-title>
         <template v-if="showHistory">
-            <v-simple-table dense :height="55 + (43 * tradeList.length)">
+            <v-simple-table dense :height="55 + (43 * (tradeList.length == 0 ? 1 : tradeList.length))">
                 <template v-slot:default>
                     <thead>
                         <tr>

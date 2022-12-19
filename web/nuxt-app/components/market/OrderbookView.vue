@@ -95,16 +95,24 @@ export default {
 
         var refresh = false
         const updateOrderbook = async (marketSpec) => {
-            var orderBook = await $solana.getAccountInfo(marketSpec.marketData.orders)
-            var bookData = $solana.decodeOrderBook(orderBook.data, 10)
-            orderbookData.value = bookData
-            events.value.emit('update_orderbook', orderbookData.value)
+            const orderBook = await $solana.getAccountInfo(marketSpec.marketData.orders)
+            const bookData = $solana.decodeOrderBook(orderBook.data)
+            const maxOrders = 10
+            events.value.emit('update_orderbook', bookData)
+            orderbookData.value = {
+                'bids': (bookData.bids.length > maxOrders) ? bookData.bids.slice(0, maxOrders) : bookData.bids,
+                'asks': (bookData.asks.length > maxOrders) ? bookData.asks.slice(0, maxOrders) : bookData.asks,
+            }
             console.log('Orderbook loaded')
             if (!refresh) {
                 refresh = true
                 $solana.provider.connection.onAccountChange(marketSpec.marketData.orders, (accountInfo, context) => {
-                    orderbookData.value = $solana.decodeOrderBook(accountInfo.data)
-                    events.value.emit('update_orderbook', orderbookData.value)
+                    const bookUpdate = $solana.decodeOrderBook(accountInfo.data)
+                    events.value.emit('update_orderbook', bookUpdate)
+                    orderbookData.value = {
+                        'bids': (bookUpdate.bids.length > maxOrders) ? bookUpdate.bids.slice(0, maxOrders) : bookUpdate.bids,
+                        'asks': (bookUpdate.asks.length > maxOrders) ? bookUpdate.asks.slice(0, maxOrders) : bookUpdate.asks,
+                    }
                     console.log('Orderbook updated')
                 })
             }

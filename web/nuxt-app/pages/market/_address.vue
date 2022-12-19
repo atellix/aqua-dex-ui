@@ -96,7 +96,7 @@ export default {
     head() {
         return {
             title: this.pageHead.pageTitle,
-            meta:[
+            /*meta:[
                 { hid: 'description', name: 'description', content:  this.pageHead.description },
                 { hid: 'og:title', property: 'og:title', content: this.pageHead.pageTitle },
                 { hid: 'og:url', property: 'og:url', content: this.pageHead.pageUrl },
@@ -108,7 +108,7 @@ export default {
                 { hid: "twitter:url", name: "twitter:url", content: this.pageHead.pageUrl },
                 { hid: 'twitter:description', name: 'twitter:description', content: this.pageHead.description },
                 //{ hid: "twitter:image", name: "twitter:image", content: process.env.baseUrl + ogImage},
-            ],
+            ],*/
             link: [
                 { hid: "canonical", rel: "canonical", href: this.pageHead.pageUrl },
             ]
@@ -120,10 +120,10 @@ export default {
             'marketLoading': true
         });
         const pageHead = ref({
-            'pageTitle': 'SOL / USDC (Dev)',
+            'pageTitle': '',
             'pageUrl': window.location.href,
             //'pageImage': 
-            'description': 'Solana SPL Token swap market'
+            'description': '',
         });
         const eventQueue = ref(new Emitter());
         const marketAccounts = ref({});
@@ -205,13 +205,14 @@ export default {
                             //console.log(marketData);
                             var marketStateData = await $solana.getAccountData('aqua-dex', 'marketState', marketData.state);
                             //console.log(marketStateData);
-                            const marketAgent = await $solana.programAddress([marketPK.toBuffer()], $solana.program['aqua-dex'].programId)
-                            const marketAgentPK = new PublicKey(marketAgent.pubkey)
-                            const tokenVault1 = await $solana.associatedTokenAddress(marketAgentPK, marketData.mktMint)
-                            const tokenVault2 = await $solana.associatedTokenAddress(marketAgentPK, marketData.prcMint)
-                            const userToken1 = await $solana.associatedTokenAddress(walletPK, marketData.mktMint)
-                            const userToken2 = await $solana.associatedTokenAddress(walletPK, marketData.prcMint)
-                            const marketMeta = await getMarketMetadata(marketAddr)
+                            const marketAgent = await $solana.programAddress([marketPK.toBuffer()], $solana.program['aqua-dex'].programId);
+                            const marketAgentPK = new PublicKey(marketAgent.pubkey);
+                            const tokenVault1 = await $solana.associatedTokenAddress(marketAgentPK, marketData.mktMint);
+                            const tokenVault2 = await $solana.associatedTokenAddress(marketAgentPK, marketData.prcMint);
+                            const userToken1 = await $solana.associatedTokenAddress(walletPK, marketData.mktMint);
+                            const userToken2 = await $solana.associatedTokenAddress(walletPK, marketData.prcMint);
+                            const marketMeta = await getMarketMetadata(marketAddr);
+                            pageHead.value.pageTitle = marketMeta.name || 'SPL Token Swap Market';
                             marketAccounts.value = {
                                 'market': marketPK,
                                 'state': marketData.state,
@@ -236,8 +237,8 @@ export default {
                                 'userWallet': walletPK,
                                 'mktTokenLabel': marketMeta.metadata.marketToken.name || 'Market Token',
                                 'prcTokenLabel': marketMeta.metadata.pricingToken.name || 'Pricing Token',
-                                'mktTokenSymbol': marketMeta.metadata.marketToken.symbol || '',
-                                'prcTokenSymbol': marketMeta.metadata.pricingToken.symbol || '',
+                                'mktTokenSymbol': marketMeta.metadata.marketToken.symbol || 'MKT',
+                                'prcTokenSymbol': marketMeta.metadata.pricingToken.symbol || 'PRC',
                                 'mktTokenDecimals': new Number(marketData.mktDecimals),
                                 'prcTokenDecimals': new Number(marketData.prcDecimals),
                                 'mktTokenScale': 10 ** new Number(marketData.mktDecimals),
