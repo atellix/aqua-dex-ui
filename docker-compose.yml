@@ -1,12 +1,10 @@
 version: '3'
 services: 
-  web:
+  nginx:
     restart: always
-    build: ./web
+    build: ./nginx
     ports:
       - "9443:9443"
-    #volumes:
-    #  - "./web/nuxt-app:/usr/src/nuxt-app"
     entrypoint: npm run dev
     networks:
       - net3
