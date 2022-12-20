@@ -94,3 +94,6 @@ sw.*
 
 # Folders
 nginx/html/
+
+# Wallets
+wallet_*

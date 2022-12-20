@@ -98,7 +98,6 @@ import { DateTime } from 'luxon'
 import axios from 'axios'
 
 const production = false
-const baseURL = 'https://aqua-dev1.atellix.net:8000/v1/'
 
 export default {
     props: ['market', 'events'],
@@ -110,6 +109,7 @@ export default {
         const currentPage = ref(1)
         const showHistory = ref(false)
         const tradeList = ref([])
+        const baseURL = 'https://' + document.location.host + '/v1/'
         const loadLastTx = async (market, user) => {
             var url = baseURL + 'last_tx'
             var res = await axios.post(url, JSON.stringify({

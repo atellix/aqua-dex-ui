@@ -19,9 +19,9 @@
                                 Access Market &raquo;
                             </v-btn>
                         </router-link>
-                        <v-btn icon>
+                        <!--<v-btn icon>
                             <v-icon>{{ icons.mdiShareVariantOutline }}</v-icon>
-                        </v-btn>
+                        </v-btn>-->
                     </v-card-actions>
                     <v-card-text v-if="!$store.state.device.isDesktop" style="margin-left: -12px;">
                         <a :href="phantomLink(marketInfo.address)">

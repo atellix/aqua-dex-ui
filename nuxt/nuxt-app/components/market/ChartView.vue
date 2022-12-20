@@ -16,8 +16,6 @@ import { mdiDotsVertical, mdiTrendingUp, mdiCurrencyUsd } from '@mdi/js'
 import { ref, toRefs, watch, onMounted, getCurrentInstance } from '@vue/composition-api'
 import axios from 'axios'
 
-const baseURL = 'https://aqua-dev1.atellix.net:8000/v1/'
-
 export default {
     props: ['market'],
     components: {
@@ -86,6 +84,7 @@ export default {
         }
         const loadData = async (vr, cd, sc, m, v) => {
             console.log('Loading chart data: ' + m + ' ' + v)
+            const baseURL = 'https://' + document.location.host + '/v1/'
             var url = baseURL + 'history'
             var res = await axios.post(url, JSON.stringify({
                 'market': m,

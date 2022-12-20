@@ -1,0 +1,3 @@
+[submodule "vial"]
+	path = vial
+	url = https://github.com/atellix/aqua-vial

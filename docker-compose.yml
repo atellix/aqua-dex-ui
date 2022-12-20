@@ -5,7 +5,22 @@ services:
     build: ./nginx
     ports:
       - "9443:9443"
+    links:
+      - "vial:vial"
     command: "/etc/nginx/run_nginx.sh"
+    env_file: .env
+    networks:
+      - net3
+
+  vial:
+    restart: always
+    build: ./vial
+    expose:
+      - "8000"
+    links:
+      - "timescaledb:timescaledb"
+    volumes:
+      - "./wallet_1.json:/usr/local/aqua-vial/wallet_1.json"
     env_file: .env
     networks:
       - net3
@@ -13,8 +28,8 @@ services:
   timescaledb:
     image: timescale/timescaledb:latest-pg14
     restart: always
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - "tsdata:/home/postgres/pgdata/data"
     env_file: .env

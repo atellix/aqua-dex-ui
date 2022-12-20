@@ -79,8 +79,6 @@ import OrderEntry from "@/components/market/OrderEntry.vue";
 import TradeLog from "@/components/market/TradeLog.vue";
 import TradeHistory from "@/components/market/TradeHistory.vue";
 
-const baseURL = 'https://aqua-dev1.atellix.net:8000/v1/'
-
 export default {
     components: {
         MarketSummary,
@@ -136,6 +134,7 @@ export default {
         const alertText = ref('');
         const alertTimeout = ref(-1);
         const route = context.root.$route;
+        const baseURL = 'https://' + document.location.host + '/v1/'
 
         const getMarketMetadata = async (market) => {
             const url = baseURL + 'market_info';
