@@ -30,8 +30,8 @@
                         <a href="https://atellix.com" class="text-decoration-none" target="_blank">Atellix, Inc.</a>
                     </span>
                     <span class="d-sm-inline d-none">
-                        <a href="https://themeselection.com/blog/" target="_blank" class="me-6 text--secondary text-decoration-none">Terms</a>
-                        <a href="https://github.com/LICENSE" target="_blank" class="text--secondary text-decoration-none">MIT Licence</a>
+                        <a href="#" target="_blank" class="me-6 text--secondary text-decoration-none">Terms</a>
+                        <a href="https://github.com/atellix/aqua-dex-ui/blob/main/LICENSE" target="_blank" class="text--secondary text-decoration-none">MIT Licence</a>
                     </span>
                 </div>
             </div>
