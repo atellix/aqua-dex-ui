@@ -27,6 +27,9 @@
                                 Fee
                             </th>
                             <th>
+                                Rebate
+                            </th>
+                            <th>
                                 &nbsp;
                             </th>
                         </tr>
@@ -69,6 +72,14 @@
                             <td>
                                 <template v-if="trade.role == 'taker'">
                                     {{ (new Number(trade.data.takerFee / market.prcTokenScale)).toFixed(4) }}
+                                </template>
+                                <template v-else>
+                                    {{ (new Number(0)).toFixed(4) }}
+                                </template>
+                            </td>
+                            <td>
+                                <template v-if="trade.role == 'maker'">
+                                    {{ (new Number(trade.data.makerRebate / market.prcTokenScale)).toFixed(4) }}
                                 </template>
                                 <template v-else>
                                     {{ (new Number(0)).toFixed(4) }}

@@ -24,6 +24,9 @@
             <span>Solana blockchain</span>
         </v-card-subtitle>
         <v-card-text>
+            <p>
+                <strong>Maker Rebate:</strong> {{ (new Number(market.marketData.makerRebate / 1000)).toFixed(1) }} bps - <strong>Taker Fee:</strong> {{ (new Number(market.marketData.takerFee / 1000)).toFixed(1) }} bps
+            </p>
             <v-row>
                 <v-col v-for="data in statisticsData" :key="data.title" cols="6" md="6" class="d-flex align-center">
                     <v-avatar size="44" :color="resolveStatisticsIconVariation (data.title).color" rounded class="elevation-1">

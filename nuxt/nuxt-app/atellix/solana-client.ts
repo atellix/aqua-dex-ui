@@ -644,7 +644,7 @@ export default {
         }
         //console.log(operationSpec)
         var tx = new Transaction()
-        tx.add(ComputeBudgetProgram.setComputeUnitLimit({units: 400000}))
+        tx.add(ComputeBudgetProgram.setComputeUnitLimit({units: 1000000}))
         if (orderSpec['orderType'] === 'bid') {
             if (orderSpec['matchType'] === 'limit') {
                 tx.add(this.program['aqua-dex'].instruction.limitBid(
