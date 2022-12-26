@@ -3,6 +3,10 @@ import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import { GlowWalletAdapter } from '@solana/wallet-adapter-glow'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare'
+import { BackpackWalletAdapter } from '@solana/wallet-adapter-backpack'
+import { BraveWalletAdapter } from '@solana/wallet-adapter-brave'
+import { CoinbaseWalletAdapter } from '@solana/wallet-adapter-coinbase'
+import { ExodusWalletAdapter } from '@solana/wallet-adapter-exodus'
 import { AnchorProvider, Program, BN, setProvider } from '@project-serum/anchor'
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAccount, createAssociatedTokenAccountInstruction, TokenAccountNotFoundError } from '@solana/spl-token'
 import { v4 as uuidv4, parse as uuidParse } from 'uuid'
@@ -44,6 +48,10 @@ export default {
             new PhantomWalletAdapter(),
             new SolflareWalletAdapter({ network }),
             new GlowWalletAdapter(),
+            new BackpackWalletAdapter(),
+            new BraveWalletAdapter(),
+            new CoinbaseWalletAdapter(),
+            new ExodusWalletAdapter(),
         ]
     },
     getWallets() {
@@ -568,6 +576,7 @@ export default {
         const instPerPage = Math.floor((16384 - (headerSize + offsetSize)) / stLogEntry.span)
         const stSlabVec = lo.struct([
             lo.blob(offsetSize),
+            lo.blob(32, 'market'),
             lo.nu64('trade_count'),
             lo.nu64('entry_max'),
             lo.seq(stLogEntry, instPerPage, 'logs'),

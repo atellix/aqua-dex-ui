@@ -117,6 +117,10 @@ export default {
             '@solana/wallet-adapter-solflare',
             '@solana/wallet-adapter-phantom',
             '@solana/wallet-adapter-glow',
+            '@solana/wallet-adapter-backpack',
+            '@solana/wallet-adapter-brave',
+            '@solana/wallet-adapter-coinbase',
+            '@solana/wallet-adapter-exodus',
         ],
         extend(config) {
                 config.module.rules.push({
