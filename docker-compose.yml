@@ -4,7 +4,7 @@ services:
     restart: always
     build: ./nginx
     ports:
-      - "9443:9443"
+      - "9444:9444"
     links:
       - "vial:vial"
     command: "/etc/nginx/run_nginx.sh"

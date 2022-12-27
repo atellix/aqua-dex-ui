@@ -22,7 +22,7 @@ gzip_types          *;
 #}
 
 server {
-    listen 9443 ssl;
+    listen 9444 ssl;
     charset utf-8;
     root /usr/share/nginx/html;
 

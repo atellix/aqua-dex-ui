@@ -56,7 +56,12 @@ export default {
         // https://go.nuxtjs.dev/axios
         "@nuxtjs/axios",
         "@nuxtjs/style-resources",
+        "@nuxtjs/proxy",
     ],
+
+    proxy: {
+        '/v1': 'https://aqua-dev1.atellix.net:9444'
+    },
 
     styleResources: {
         scss: [
@@ -93,13 +98,6 @@ export default {
                     warning: "#ff9800",
                     info: "#3f51b5",
                     success: "#4caf50",
-                    /*primary: "#9155FD",
-                    accent: "#0d6efd",
-                    secondary: "#8A8D93",
-                    success: "#56CA00",
-                    info: "#16B1FF",
-                    warning: "#FFB400",
-                    error: "#FF4C51",*/
                 },
             },
         },
@@ -114,6 +112,10 @@ export default {
             '@solana/wallet-adapter-solflare',
             '@solana/wallet-adapter-phantom',
             '@solana/wallet-adapter-glow',
+            '@solana/wallet-adapter-backpack',
+            '@solana/wallet-adapter-brave',
+            '@solana/wallet-adapter-coinbase',
+            '@solana/wallet-adapter-exodus',
         ],
         extend(config) {
                 config.module.rules.push({
