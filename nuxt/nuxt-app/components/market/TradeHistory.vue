@@ -108,7 +108,7 @@ import { ref, toRefs, watch } from '@vue/composition-api'
 import { DateTime } from 'luxon'
 import axios from 'axios'
 
-const production = false
+const production = true
 
 export default {
     props: ['market', 'events'],
