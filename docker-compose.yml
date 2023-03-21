@@ -4,15 +4,16 @@ services:
     restart: always
     build: ./nginx
     ports:
-      - "9444:9444"
+      - "80:80"
+      - "443:443"
     links:
-      - "vial:vial"
+      - "vialapi:vialapi"
     command: "/etc/nginx/run_nginx.sh"
     env_file: .env
     networks:
       - net3
 
-  vial:
+  vialapi:
     restart: always
     build: ./vial
     expose:
@@ -22,6 +23,19 @@ services:
     volumes:
       - "./wallet_1.json:/usr/local/aqua-vial/wallet_1.json"
     env_file: .env
+    command: "node bin/aqua-vial.js --log-level=debug --markets-json=markets.json --tokens-json=tokens.json --service-mode=api --port=8000"
+    networks:
+      - net3
+
+  vialrpc:
+    restart: always
+    build: ./vial
+    links:
+      - "timescaledb:timescaledb"
+    volumes:
+      - "./wallet_1.json:/usr/local/aqua-vial/wallet_1.json"
+    env_file: .env
+    command: "node bin/aqua-vial.js --log-level=debug --markets-json=markets.json --tokens-json=tokens.json --service-mode=rpc --port=8001"
     networks:
       - net3
 
@@ -31,7 +45,7 @@ services:
     expose:
       - "5432"
     volumes:
-      - "tsdata:/home/postgres/pgdata/data"
+      - "tsdata:/var/lib/postgresql/data"
     env_file: .env
     networks:
       - net3

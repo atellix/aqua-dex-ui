@@ -1,4 +1,4 @@
-import { PublicKey, Keypair, Connection, Transaction, SystemProgram, ComputeBudgetProgram, clusterApiUrl } from '@solana/web3.js'
+import { PublicKey, Keypair, Connection, Transaction, SystemProgram, ComputeBudgetProgram } from '@solana/web3.js'
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import { GlowWalletAdapter } from '@solana/wallet-adapter-glow'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
@@ -18,7 +18,8 @@ import lo from 'buffer-layout'
 import base32 from 'base32.js'
 import bs58 from 'bs58'
 
-const SOLANA_NETWORK = 'devnet'
+const SOLANA_API_URL = 'https://withered-withered-bridge.solana-mainnet.discover.quiknode.pro/15496b6eaef4b2d99c35cd91f260047219b399f6/'
+
 const ANCHOR_IDL = {
     'aqua-dex': require('@/atellix/idl/aqua_dex.json'),
 }
@@ -55,7 +56,7 @@ export default {
         ]
     },
     getWallets() {
-        const network = WalletAdapterNetwork.Devnet
+        const network = WalletAdapterNetwork.Mainnet
         //console.log('Get Wallet Adapters: ' + network)
         let adapters = this.getWalletAdapters(network)
         let wallets = []
@@ -71,7 +72,7 @@ export default {
         return wallets
     },
     getProvider(adapter) {
-        let apiUrl = clusterApiUrl(SOLANA_NETWORK)
+        let apiUrl = SOLANA_API_URL
         let wallet = {
             publicKey: adapter.publicKey,
             signTransaction: function (transaction) { return adapter.signTransaction(transaction) },
