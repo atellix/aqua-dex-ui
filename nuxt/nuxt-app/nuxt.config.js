@@ -3,8 +3,11 @@ import path from 'path';
 import colors from "vuetify/es5/util/colors";
 
 export default {
-    generate: {
-        dir: '../../nginx/html'
+    server: {
+        https: {
+            key: fs.readFileSync(path.resolve(__dirname, 'privkey.pem')),
+            cert: fs.readFileSync(path.resolve(__dirname, 'fullchain.pem'))
+        }
     },
     // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
     ssr: false,
@@ -53,7 +56,12 @@ export default {
         // https://go.nuxtjs.dev/axios
         "@nuxtjs/axios",
         "@nuxtjs/style-resources",
+        "@nuxtjs/proxy",
     ],
+
+    proxy: {
+        '/v1': 'http://173.234.24.74:8000'
+    },
 
     styleResources: {
         scss: [
