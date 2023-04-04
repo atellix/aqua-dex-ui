@@ -105,17 +105,16 @@ export default {
 
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {
+        standalone: true,
         transpile: [
             '@solana/buffer-layout-utils',
+            '@solana/web3.js',
             '@solana/spl-token',
             '@solana/wallet-adapter-base',
             '@solana/wallet-adapter-solflare',
             '@solana/wallet-adapter-phantom',
             '@solana/wallet-adapter-glow',
             '@solana/wallet-adapter-backpack',
-            '@solana/wallet-adapter-brave',
-            '@solana/wallet-adapter-coinbase',
-            '@solana/wallet-adapter-exodus',
         ],
         extend(config) {
                 config.module.rules.push({

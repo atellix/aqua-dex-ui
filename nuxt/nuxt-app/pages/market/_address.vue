@@ -148,7 +148,7 @@ export default {
             }
         };
 
-        onMounted(async () => {
+        /*onMounted(async () => {
             $solana.init();
             var wallets = $solana.getWallets();
             //console.log('Wallets', wallets);
@@ -248,7 +248,7 @@ export default {
                     }
                 }
             })();
-        });
+        });*/
 
         const timeout = (ms) => {
             return new Promise(resolve => setTimeout(resolve, ms, null));

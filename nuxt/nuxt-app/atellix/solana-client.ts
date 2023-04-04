@@ -4,9 +4,6 @@ import { GlowWalletAdapter } from '@solana/wallet-adapter-glow'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare'
 import { BackpackWalletAdapter } from '@solana/wallet-adapter-backpack'
-import { BraveWalletAdapter } from '@solana/wallet-adapter-brave'
-import { CoinbaseWalletAdapter } from '@solana/wallet-adapter-coinbase'
-import { ExodusWalletAdapter } from '@solana/wallet-adapter-exodus'
 import { AnchorProvider, Program, BN, setProvider } from '@project-serum/anchor'
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAccount, createAssociatedTokenAccountInstruction, TokenAccountNotFoundError } from '@solana/spl-token'
 import { v4 as uuidv4, parse as uuidParse } from 'uuid'
@@ -51,26 +48,11 @@ export default {
             new SolflareWalletAdapter({ network }),
             new GlowWalletAdapter(),
             new BackpackWalletAdapter(),
-            new BraveWalletAdapter(),
-            new CoinbaseWalletAdapter(),
-            new ExodusWalletAdapter(),
         ]
     },
     getWallets() {
         const network = WalletAdapterNetwork.Mainnet
-        //console.log('Get Wallet Adapters: ' + network)
-        let adapters = this.getWalletAdapters(network)
-        let wallets = []
-        for (var i = 0; i < adapters.length; i++) {
-            let adp = adapters[i]
-            //console.log(adp.name + ': ' + adp.readyState)
-            if (adp.readyState === 'Installed') {
-                wallets.push(adp)
-                //break
-            }
-            //console.log(adp)
-        }
-        return wallets
+        return this.getWalletAdapters(network)
     },
     getProvider(adapter) {
         let apiUrl = SOLANA_API_URL
