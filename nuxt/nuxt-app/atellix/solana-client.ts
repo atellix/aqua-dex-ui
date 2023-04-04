@@ -18,7 +18,8 @@ import lo from 'buffer-layout'
 import base32 from 'base32.js'
 import bs58 from 'bs58'
 
-const SOLANA_API_URL = 'https://withered-withered-bridge.solana-mainnet.discover.quiknode.pro/15496b6eaef4b2d99c35cd91f260047219b399f6/'
+//const SOLANA_API_URL = 'https://withered-withered-bridge.solana-mainnet.discover.quiknode.pro/15496b6eaef4b2d99c35cd91f260047219b399f6/'
+const SOLANA_API_URL = 'https://api.devnet.solana.com'
 
 const ANCHOR_IDL = {
     'aqua-dex': require('@/atellix/idl/aqua_dex.json'),
@@ -277,6 +278,7 @@ export default {
         return nodeSpec
     },
     decodeOrdersVec(pageTableEntry, pages) {
+        console.log(pageTableEntry)
         const headerSize = pageTableEntry['header_size']
         const offsetSize = pageTableEntry['offset_size']
         const stOrder = lo.struct([

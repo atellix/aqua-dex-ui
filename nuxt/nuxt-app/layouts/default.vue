@@ -26,7 +26,7 @@
             <div class="boxed-container w-full">
                 <div class="mx-6 d-flex justify-space-between">
                     <span>
-                        &copy; 2022
+                        &copy; {{ year }}
                         <a href="https://atellix.com" class="text-decoration-none" target="_blank">Atellix, Inc.</a>
                     </span>
                     <span class="d-sm-inline d-none">
@@ -54,8 +54,10 @@ export default {
     },
     setup() {
         const isDrawerOpen = ref(null);
+        const year = new Date().getFullYear()
 
         return {
+            year,
             isDrawerOpen,
 
             // Icons

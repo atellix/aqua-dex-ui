@@ -39,6 +39,32 @@
       "args": []
     },
     {
+      "name": "deactivate",
+      "accounts": [
+        {
+          "name": "rootData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "programData",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "programAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "storeMetadata",
       "accounts": [
         {
@@ -325,6 +351,10 @@
           "type": "u64"
         },
         {
+          "name": "inpTickDecimals",
+          "type": "u8"
+        },
+        {
           "name": "inpTakerFee",
           "type": "u32"
         },
@@ -434,7 +464,7 @@
           "type": "u64"
         },
         {
-          "name": "inpPrice",
+          "name": "inpPriceRequest",
           "type": "u64"
         },
         {
@@ -542,7 +572,7 @@
           "type": "u64"
         },
         {
-          "name": "inpPrice",
+          "name": "inpPriceRequest",
           "type": "u64"
         },
         {
@@ -1281,6 +1311,10 @@
           "type": "u64"
         },
         {
+          "name": "inpTickDecimals",
+          "type": "u8"
+        },
+        {
           "name": "inpTakerFee",
           "type": "u32"
         },
@@ -1623,6 +1657,10 @@
           {
             "name": "minQuantity",
             "type": "u64"
+          },
+          {
+            "name": "tickDecimals",
+            "type": "u8"
           },
           {
             "name": "logFee",
@@ -2636,6 +2674,6 @@
     }
   ],
   "metadata": {
-    "address": "AQUA3y76EwUE2CgxbaMUMpa54G8PyGRExRdhLK8bN4VR"
+    "address": "AQUAvuZCFUGtSc8uQBaTXfJz3YjMUbinMeXDoDQmZLvX"
   }
 }

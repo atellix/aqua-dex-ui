@@ -16,14 +16,14 @@ services:
   vialapi:
     restart: always
     build: ./vial
-    expose:
-      - "8000"
+    ports:
+      - "8002:8002"
     links:
       - "timescaledb:timescaledb"
     volumes:
       - "./wallet_1.json:/usr/local/aqua-vial/wallet_1.json"
     env_file: .env
-    command: "node bin/aqua-vial.js --log-level=debug --markets-json=markets.json --tokens-json=tokens.json --service-mode=api --port=8000"
+    command: "node bin/aqua-vial.js --log-level=debug --markets-json=markets.json --tokens-json=tokens.json --service-mode=api --port=8002"
     networks:
       - net3
 

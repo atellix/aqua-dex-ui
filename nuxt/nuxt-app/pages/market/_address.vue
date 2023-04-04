@@ -200,10 +200,11 @@ export default {
                         if (marketKeyData.length === 32) {
                             var marketPK = new PublicKey(marketAddr);
                             var walletPK = new PublicKey(walletPubkey.value);
+                            console.log(marketPK.toString());
                             var marketData = await $solana.getAccountData('aqua-dex', 'market', marketPK);
-                            //console.log(marketData);
+                            console.log(marketData);
                             var marketStateData = await $solana.getAccountData('aqua-dex', 'marketState', marketData.state);
-                            //console.log(marketStateData);
+                            console.log(marketStateData);
                             const marketAgent = await $solana.programAddress([marketPK.toBuffer()], $solana.program['aqua-dex'].programId);
                             const marketAgentPK = new PublicKey(marketAgent.pubkey);
                             const tokenVault1 = await $solana.associatedTokenAddress(marketAgentPK, marketData.mktMint);

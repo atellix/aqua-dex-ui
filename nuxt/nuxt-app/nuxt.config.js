@@ -60,7 +60,7 @@ export default {
     ],
 
     proxy: {
-        '/v1': 'http://173.234.24.74:8000'
+        '/v1': 'http://173.234.24.76:8002'
     },
 
     styleResources: {
