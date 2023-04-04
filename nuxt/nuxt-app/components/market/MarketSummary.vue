@@ -1,10 +1,11 @@
 <template>
     <v-card v-if="!market.marketReady">
         <template v-if="market.marketLoading">
-            <v-card-title class="align-start">
-                <span class="font-weight-semibold">Market loading...</span>
-            </v-card-title>
-            <v-card-text>&nbsp;</v-card-text>
+            <v-card-text>
+                <div style="float: left;">Select a Solana wallet to connect.</div>
+                <wallet-multi-button :wallets="wallets" autoConnect ref="mainWallet"/>
+                <br clear="all"/>
+            </v-card-text>
         </template>
         <template v-else>
             <v-card-title class="align-start">
@@ -16,25 +17,36 @@
         </template>
     </v-card>
     <v-card v-else>
-        <v-card-title class="align-start">
-            <span class="font-weight-semibold">{{ market.marketTitle }}</span>
-        </v-card-title>
-        <v-card-subtitle class="mb-0 mt-n5">
-            <span class="font-weight-semibold text--primary me-1">AquaDEX protocol</span>
-            <span>Solana blockchain</span>
-        </v-card-subtitle>
+        <v-row no-gutters transition="slide-y-transition">
+            <v-col cols="12" sm="6">
+                <v-card-title class="align-start">
+                    <span class="font-weight-semibold">{{ market.marketTitle }}</span>
+                </v-card-title>
+                <v-card-subtitle class="mb-n5 mt-n5">
+                    <span class="font-weight-semibold text--primary me-1">AquaDEX protocol</span>
+                    <span>Solana blockchain</span>
+                    <p>
+                        <strong>Fee:</strong> {{ (new Number(market.marketData.takerFee / 1000)).toFixed(1) }} bps
+                        -
+                        <strong>Rebate:</strong> {{ (new Number(market.marketData.makerRebate / 1000)).toFixed(1) }} bps
+                    </p>
+                </v-card-subtitle>
+            </v-col>
+            <v-col cols="12" sm="6">
+                <div class="mt-4 mr-4">
+                    <wallet-multi-button :wallets="wallets" autoConnect ref="mainWallet"/>
+                </div>
+            </v-col>
+        </v-row>
         <v-card-text>
-            <p>
-                <strong>Maker Rebate:</strong> {{ (new Number(market.marketData.makerRebate / 1000)).toFixed(1) }} bps - <strong>Taker Fee:</strong> {{ (new Number(market.marketData.takerFee / 1000)).toFixed(1) }} bps
-            </p>
-            <v-row>
-                <v-col v-for="data in statisticsData" :key="data.title" cols="6" md="6" class="d-flex align-center">
+            <v-row no-gutters>
+                <v-col v-for="data in statisticsData" :key="data.title" cols="12" sm="6" class="d-flex align-center">
                     <v-avatar size="44" :color="resolveStatisticsIconVariation (data.title).color" rounded class="elevation-1">
                         <v-icon dark color="white" size="30">
                             {{ resolveStatisticsIconVariation (data.title).icon }}
                         </v-icon>
                     </v-avatar>
-                    <div class="ms-3">
+                    <div class="ms-3 mb-3">
                         <p class="text-xs mb-0">{{ data.title }}</p>
                         <h4>{{ data.total }}</h4>
                     </div>
@@ -47,15 +59,42 @@
 <script>
 // eslint-disable-next-line object-curly-newline
 import { mdiClockCheckOutline, mdiCashCheck } from '@mdi/js'
-import { watch, toRefs, ref } from '@vue/composition-api'
-import $solana from '@/atellix/solana-client'
+import { onMounted, watch, toRefs, ref } from '@vue/composition-api'
+import { WalletMultiButton } from 'solana-wallets-vue-2'
 import { PublicKey } from '@solana/web3.js'
 import { DateTime } from 'luxon'
 
+import $solana from '@/atellix/solana-client'
+import 'solana-wallets-vue-2/styles.css'
+
 export default {
-    props: ['market'],
-    setup(props) {
-        const { market } = toRefs(props)
+    props: ['market', 'events'],
+    components: {
+        WalletMultiButton
+    },
+    setup(props, context) {
+        const { market, events } = toRefs(props)
+
+        // Connect wallet
+        const wallets = ref($solana.getWallets())
+        const solanaInit = ref(true)
+        
+        onMounted(() => {
+            watch(context.refs.mainWallet.walletStore, (current, prev) => {
+                const connected = context.refs.mainWallet.walletStore.connected && !context.refs.mainWallet.walletStore.disconnecting
+                if (solanaInit.value && current.connected) {
+                    solanaInit.value = false
+                    $solana.init()
+                    $solana.getProvider(context.refs.mainWallet.walletStore)
+                }
+                context.root.$store.commit('setWallet', {
+                    'connected': connected,
+                    'pubkey': connected ? context.refs.mainWallet.walletStore.publicKey : '',
+                })
+                events.value.emit('wallet_connected', connected)
+            })
+        })
+
         const statisticsData = ref([
             {
                 title: 'Last Price',
@@ -99,6 +138,7 @@ export default {
         })
 
         return {
+            wallets,
             statisticsData,
             resolveStatisticsIconVariation,
 
@@ -111,3 +151,20 @@ export default {
     },
 }
 </script>
+<style lang="css">
+.swv-dropdown {
+    float: right;
+}
+.swv-dropdown-list {
+    padding-left: 10px !important;
+}
+.swv-button {
+    float: right;
+}
+.swv-button p {
+    margin-bottom: 0 !important;
+}
+.swv-modal-list {
+    padding-left: 0 !important;
+}
+</style>

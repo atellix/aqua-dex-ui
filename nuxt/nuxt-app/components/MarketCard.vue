@@ -23,11 +23,6 @@
                             <v-icon>{{ icons.mdiShareVariantOutline }}</v-icon>
                         </v-btn>-->
                     </v-card-actions>
-                    <v-card-text v-if="!$store.state.device.isDesktop" style="margin-left: -12px;">
-                        <a :href="phantomLink(marketInfo.address)">
-                            <v-img height="38" width="169" :src="require('@/assets/images/atellix/phantom-open-1.png')"></v-img>
-                        </a>
-                    </v-card-text>
                     <v-card-text>
                         {{ marketInfo.description }}
                     </v-card-text>

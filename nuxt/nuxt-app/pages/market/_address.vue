@@ -4,7 +4,7 @@
             <v-col cols="12" md="8">
                 <v-row no-gutter>
                     <v-col cols="12">
-                        <market-summary :market="marketSummary"></market-summary>
+                        <market-summary :market="marketSummary" :events="eventQueue"></market-summary>
                     </v-col>
                 </v-row>
                 <v-row no-gutter>
@@ -63,7 +63,7 @@ import {
     mdiCurrencyUsd,
     mdiHelpCircleOutline,
 } from "@mdi/js";
-import { ref, onMounted } from '@vue/composition-api';
+import { onMounted, ref, watch } from '@vue/composition-api';
 import { PublicKey } from '@solana/web3.js';
 import $solana from '@/atellix/solana-client';
 import Emitter from 'tiny-emitter';
@@ -113,9 +113,10 @@ export default {
         }
     },
     setup(props, context) {
-        const eventbus = new Emitter();
+        const solanaStart = ref(true);
         const marketSummary = ref({
-            'marketLoading': true
+            'marketReady': false,
+            'marketLoading': true,
         });
         const pageHead = ref({
             'pageTitle': '',
@@ -126,10 +127,6 @@ export default {
         const eventQueue = ref(new Emitter());
         const marketAccounts = ref({});
         const orderbookData = ref({});
-        const walletConnected = ref(false);
-        const walletProcessing = ref(false);
-        const walletIcon = ref(false);
-        const walletPubkey = ref(false);
         const showAlert = ref(false);
         const alertText = ref('');
         const alertTimeout = ref(-1);
@@ -148,106 +145,73 @@ export default {
             }
         };
 
-        onMounted(async () => {
-            $solana.init();
-            var wallets = $solana.getWallets();
-            //console.log('Wallets', wallets);
-            var walletAdapter;
-            var walletAwait = new Promise((resolve) => {
-                eventbus.on('WalletConnected', function (val) {
-                    resolve(val);
+        eventQueue.value.on('wallet_connected', async (connected) => {
+            //console.log('Connected? ' + connected)
+            if (solanaStart.value && connected) {
+                console.log('Solana ready!');
+                solanaStart.value = false
+                $solana.loadProgram('aqua-dex');
+                $solana.updateRegister(async (sig) => {
+                    return true;
                 });
-            });
-            if (wallets.length > 0) {
-                walletAdapter = wallets[0];
-                walletAdapter.on('connect', function (publicKey) {
-                    console.log('Connected to ' + publicKey.toBase58());
-                    var walletStatus = {
-                        'connnected': true,
-                        'icon': walletAdapter.icon,
-                        'pubkey': publicKey.toBase58(),
-                    };
-                    walletIcon.value = walletAdapter.icon;
-                    walletConnected.value = true;
-                    walletPubkey.value = publicKey.toBase58();
-                    eventbus.emit('WalletConnected', true);
-                });
-                walletAdapter.on('disconnect', function () {
-                    console.log('Disconnected');
-                    var walletStatus = {
-                        'connnected': false,
-                    };
-                    walletConnected.value = false;
-                    eventbus.emit('WalletConnected', false);
-                });
-                (async function (x) {
-                    await walletAdapter.connect();
-                    await walletAdapter.connect(); // Need to call twice on iOS?
-                })();
             }
-            (async function (x) {
-                var ready = await walletAwait;
-                if (ready) {
-                    console.log('Solana ready!');
-                    $solana.getProvider(walletAdapter);
-                    $solana.loadProgram('aqua-dex');
-                    $solana.updateRegister(async (sig) => {
-                        return true;
-                    });
-                    var marketAddr = route.params['address'];
-                    if (marketAddr) {
-                        var marketKeyData = bs58.decode(marketAddr);
-                        if (marketKeyData.length === 32) {
-                            var marketPK = new PublicKey(marketAddr);
-                            var walletPK = new PublicKey(walletPubkey.value);
-                            console.log(marketPK.toString());
-                            var marketData = await $solana.getAccountData('aqua-dex', 'market', marketPK);
-                            console.log(marketData);
-                            var marketStateData = await $solana.getAccountData('aqua-dex', 'marketState', marketData.state);
-                            console.log(marketStateData);
-                            const marketAgent = await $solana.programAddress([marketPK.toBuffer()], $solana.program['aqua-dex'].programId);
-                            const marketAgentPK = new PublicKey(marketAgent.pubkey);
-                            const tokenVault1 = await $solana.associatedTokenAddress(marketAgentPK, marketData.mktMint);
-                            const tokenVault2 = await $solana.associatedTokenAddress(marketAgentPK, marketData.prcMint);
-                            const userToken1 = await $solana.associatedTokenAddress(walletPK, marketData.mktMint);
-                            const userToken2 = await $solana.associatedTokenAddress(walletPK, marketData.prcMint);
-                            const marketMeta = await getMarketMetadata(marketAddr);
-                            pageHead.value.pageTitle = marketMeta.name || 'SPL Token Swap Market';
-                            marketAccounts.value = {
-                                'market': marketPK,
-                                'state': marketData.state,
-                                'agent': marketAgentPK,
-                                'user': walletPK,
-                                'userMktToken': new PublicKey(userToken1.pubkey),
-                                'userPrcToken': new PublicKey(userToken2.pubkey),
-                                'mktVault': new PublicKey(tokenVault1.pubkey),
-                                'prcVault': new PublicKey(tokenVault2.pubkey), 
-                                'orders': marketData.orders,
-                                'tradeLog': marketData.tradeLog,
-                                'settleA': marketStateData.settleA,
-                                'settleB': marketStateData.settleB,
-                            };
-                            marketSummary.value = {
-                                'marketLoading': false,
-                                'marketReady': true,
-                                'marketTitle': marketMeta.name || 'SPL Token Swap Market',
-                                'marketAddr': marketAddr,
-                                'marketData': marketData,
-                                'marketMeta': marketMeta,
-                                'userWallet': walletPK,
-                                'mktTokenLabel': marketMeta.metadata.marketToken.name || 'Market Token',
-                                'prcTokenLabel': marketMeta.metadata.pricingToken.name || 'Pricing Token',
-                                'mktTokenSymbol': marketMeta.metadata.marketToken.symbol || 'MKT',
-                                'prcTokenSymbol': marketMeta.metadata.pricingToken.symbol || 'PRC',
-                                'mktTokenDecimals': new Number(marketData.mktDecimals),
-                                'prcTokenDecimals': new Number(marketData.prcDecimals),
-                                'mktTokenScale': 10 ** new Number(marketData.mktDecimals),
-                                'prcTokenScale': 10 ** new Number(marketData.prcDecimals),
-                            };
-                        }
+            if (connected) {
+                var marketAddr = route.params['address'];
+                if (marketAddr) {
+                    var marketKeyData = bs58.decode(marketAddr);
+                    if (marketKeyData.length === 32) {
+                        var marketPK = new PublicKey(marketAddr);
+                        var walletPK = new PublicKey(context.root.$store.state.wallet_pubkey);
+                        console.log(marketPK.toString());
+                        var marketData = await $solana.getAccountData('aqua-dex', 'market', marketPK);
+                        console.log(marketData);
+                        var marketStateData = await $solana.getAccountData('aqua-dex', 'marketState', marketData.state);
+                        console.log(marketStateData);
+                        const marketAgent = await $solana.programAddress([marketPK.toBuffer()], $solana.program['aqua-dex'].programId);
+                        const marketAgentPK = new PublicKey(marketAgent.pubkey);
+                        const tokenVault1 = await $solana.associatedTokenAddress(marketAgentPK, marketData.mktMint);
+                        const tokenVault2 = await $solana.associatedTokenAddress(marketAgentPK, marketData.prcMint);
+                        const userToken1 = await $solana.associatedTokenAddress(walletPK, marketData.mktMint);
+                        const userToken2 = await $solana.associatedTokenAddress(walletPK, marketData.prcMint);
+                        const marketMeta = await getMarketMetadata(marketAddr);
+                        pageHead.value.pageTitle = marketMeta.name || 'SPL Token Swap Market';
+                        marketAccounts.value = {
+                            'market': marketPK,
+                            'state': marketData.state,
+                            'agent': marketAgentPK,
+                            'user': walletPK,
+                            'userMktToken': new PublicKey(userToken1.pubkey),
+                            'userPrcToken': new PublicKey(userToken2.pubkey),
+                            'mktVault': new PublicKey(tokenVault1.pubkey),
+                            'prcVault': new PublicKey(tokenVault2.pubkey), 
+                            'orders': marketData.orders,
+                            'tradeLog': marketData.tradeLog,
+                            'settleA': marketStateData.settleA,
+                            'settleB': marketStateData.settleB,
+                        };
+                        marketSummary.value = {
+                            'marketLoading': false,
+                            'marketReady': true,
+                            'marketTitle': marketMeta.name || 'SPL Token Swap Market',
+                            'marketAddr': marketAddr,
+                            'marketData': marketData,
+                            'marketMeta': marketMeta,
+                            'userWallet': walletPK,
+                            'mktTokenLabel': marketMeta.metadata.marketToken.name || 'Market Token',
+                            'prcTokenLabel': marketMeta.metadata.pricingToken.name || 'Pricing Token',
+                            'mktTokenSymbol': marketMeta.metadata.marketToken.symbol || 'MKT',
+                            'prcTokenSymbol': marketMeta.metadata.pricingToken.symbol || 'PRC',
+                            'mktTokenDecimals': new Number(marketData.mktDecimals),
+                            'prcTokenDecimals': new Number(marketData.prcDecimals),
+                            'mktTokenScale': 10 ** new Number(marketData.mktDecimals),
+                            'prcTokenScale': 10 ** new Number(marketData.prcDecimals),
+                        };
                     }
                 }
-            })();
+            } else if (marketSummary.value.marketReady) {
+                marketSummary.value.marketLoading = true;
+                marketSummary.value.marketReady = false;
+            }
         });
 
         const timeout = (ms) => {

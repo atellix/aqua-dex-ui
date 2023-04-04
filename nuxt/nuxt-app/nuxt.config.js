@@ -3,6 +3,9 @@ import path from 'path';
 import colors from "vuetify/es5/util/colors";
 
 export default {
+    /*generate: {
+        dir: '../../nginx/html'
+    },*/
     server: {
         https: {
             key: fs.readFileSync(path.resolve(__dirname, 'privkey.pem')),
@@ -28,7 +31,7 @@ export default {
             { hid: "description", name: "description", content: "" },
             { name: "format-detection", content: "telephone=no" },
         ],
-        link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
+        link: [{ rel: "icon", type: "image/png", href: "/favicon.png" }],
     },
 
     // Global CSS: https://go.nuxtjs.dev/config-css
@@ -116,6 +119,8 @@ export default {
             '@solana/wallet-adapter-brave',
             '@solana/wallet-adapter-coinbase',
             '@solana/wallet-adapter-exodus',
+            '@solana/wallet-adapter-slope',
+            '@solana/wallet-adapter-trust',
         ],
         extend(config) {
                 config.module.rules.push({
