@@ -3,15 +3,15 @@ import path from 'path';
 import colors from "vuetify/es5/util/colors";
 
 export default {
-    /*generate: {
+    generate: {
         dir: '../../nginx/html'
-    },*/
-    server: {
+    },
+    /*server: {
         https: {
             key: fs.readFileSync(path.resolve(__dirname, 'privkey.pem')),
             cert: fs.readFileSync(path.resolve(__dirname, 'fullchain.pem'))
         }
-    },
+    },*/
     // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
     ssr: false,
 
